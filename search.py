@@ -6,29 +6,31 @@ from tqdm import tqdm
 from datetime import datetime
 from actor import PtrNet1 
 
-def sampling(cfg, env, single_nodes):
-	same_inputs = single_nodes.repeat(cfg.batch,1,1)
+def sampling(cfg, env, test_input):
+	test_inputs = test_input.repeat(cfg.batch,1,1)
 	if os.path.exists(cfg.act_model_path):
 		act_model = torch.load(cfg.act_model_path)
 	else:
 		act_model = PtrNet1(cfg)
 	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 	act_model = act_model.to(device)
-	same_inputs.to(device)
-	pred_tours, _ = act_model(same_inputs)
-	l_batch = env.stack_l(same_inputs, pred_tours)
+	test_inputs.to(device)
+	pred_tours, _ = act_model(test_inputs)
+	l_batch = env.stack_l(test_inputs, pred_tours)
 	index_lmin = torch.argmin(l_batch)
 	best_tour = pred_tours[index_lmin]
 	return best_tour
 
-def active_search(cfg, env, single_nodes, log_path = None):
+def active_search(cfg, env, test_input, log_path = None):
 	'''
 	active search updates model parameters even during inference on a single input
+	test input:(city_t,xy)
 	'''
 	date = datetime.now().strftime('%m%d_%H_%M')
-	same_inputs = single_nodes.repeat(cfg.batch,1,1)
-	random_tours = env.stack_random_tour()
-	baseline = env.stack_l(same_inputs, random_tours)
+	test_inputs = test_input.repeat(cfg.batch,1,1)
+	random_tours = env.stack_random_tours()
+	baseline = env.stack_l(test_inputs, random_tours)
+	l_min = baseline[0]
 	
 	if os.path.exists(cfg.act_model_path):
 		act_model = torch.load(cfg.act_model_path)
@@ -46,11 +48,12 @@ def active_search(cfg, env, single_nodes, log_path = None):
 		we randomly shuffle the input sequence before feeding it to our pointer network. 
 		This increases the stochasticity of the sampling procedure and leads to large improvements in Active Search.
 		'''
-		# ~ same_inputs = env.shuffle_index(same_inputs)
-		same_inputs.to(device)
-		pred_tours, neg_log = act_model(same_inputs)
+		shuffle_inputs = env.shuffle(test_inputs)
+		shuffle_inputs.to(device)
+		pred_shuffle_tours, neg_log = act_model(shuffle_inputs)
+		pred_tours = env.back_tours(pred_shuffle_tours, shuffle_inputs, test_inputs)
 		
-		l_batch = env.stack_l(same_inputs, pred_tours)
+		l_batch = env.stack_l(test_inputs, pred_tours)
 		
 		index_lmin = torch.argmin(l_batch)
 		if torch.min(l_batch) != l_batch[index_lmin]:

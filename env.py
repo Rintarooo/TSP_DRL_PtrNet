@@ -19,31 +19,46 @@ class Env_tsp():
 		'''
 		nodes(cities) : contains all the nodes and their 2 dimensional coordinates 
 		[n,2] dimension array e.g. [[0.5,0.7],[0.2,0.3]]
-		
 		'''
 		self.batch = cfg.batch
 		self.city_t = cfg.city_t
 		self.xy = cfg.xy
 			
 	def get_nodes(self, seed = None):
+		'''
+		return nodes:(city_t,xy)
+		'''
 		if seed is not None:
 			torch.manual_seed(seed)
 		return torch.FloatTensor(self.city_t, self.xy).uniform_(0, 1)
 		
 	def stack_nodes(self):
+		'''
+		nodes:(city_t,xy)
+		return inputs:(batch,city_t,xy)
+		'''
 		list = [self.get_nodes() for i in range(self.batch)]
 		inputs = torch.stack(list, dim = 0)
 		return inputs
 		
 	def stack_random_tours(self):
+		'''
+		tour:(city_t)
+		return tours:(batch,city_t)
+		'''
 		list = [self.get_random_tour() for i in range(self.batch)]
 		tours = torch.stack(list, dim = 0)
 		return tours
 		
 	def stack_l(self, inputs, tours):
+		'''
+		inputs:(batch,city_t,xy)
+		tours:(batch,city_t)
+		return l_batch:(batch)
+		'''
 		list = [self.get_tour_distance(inputs[i], tours[i]) for i in range(self.batch)]
-		l = torch.stack(list, dim = 0)
-		return l	
+		l_batch = torch.stack(list, dim = 0)
+		return l_batch	
 		
 	def show(self, nodes, tour):
 		'''
@@ -51,7 +66,6 @@ class Env_tsp():
 		->arrow goes towards xy=end_pos from xytext=start_pos where comment is put down
 		-ref
 		http://tanukigraph.hatenablog.com/entry/2017/12/25/224725
-		
 		'''
 		print('distance:{:.3f}'.format(self.get_tour_distance(nodes, tour)))	
 		print(tour)
@@ -66,21 +80,44 @@ class Env_tsp():
 							arrowprops=dict(arrowstyle='<->', connectionstyle='arc3'))
 		plt.show()
 	
-	def shuffle_index(self, inputs):
+	def shuffle(self, inputs):
 		'''
-		inputs:(batch,city,coor)
-		shuffle along the city dimension
-		each example in batch shuffle in a different way
+		shuffle nodes order with a set of xy coordinate
+		inputs:(batch,city_t,xy)
+		return shuffle_inputs:(batch,city_t,xy)
 		'''
+		shuffle_inputs = torch.zeros(inputs.size())
 		for i in range(self.batch):
 			perm = torch.randperm(self.city_t)
-			inputs[i,:,:] = inputs[i,perm,:]
-		return inputs
+			shuffle_inputs[i,:,:] = inputs[i,perm,:]
+		return shuffle_inputs
 		
+	def back_tours(self, pred_shuffle_tours, shuffle_inputs, test_inputs):
+		'''
+		pred_shuffle_tours:(batch,city_t)
+		shuffle_inputs:(batch,city_t_t,xy)
+		test_inputs:(batch,city_t,xy)
+		return pred_tours:(city_t)
+		'''
+		pred_tours = []
+		for i in range(self.batch):
+			pred_tour = []
+			for j in range(self.city_t):
+				xy_temp = shuffle_inputs[i, pred_shuffle_tours[i, j]]
+				for k in range(self.city_t):
+					if torch.all(torch.eq(xy_temp, test_inputs[i,k])):
+						pred_tour.append(torch.tensor(k))
+						if len(pred_tour) == self.city_t:
+							pred_tours.append(torch.stack(pred_tour, dim = 0)) 
+						break
+		pred_tours = torch.stack(pred_tours, dim = 0)
+		return pred_tours 
+			
 	def get_tour_distance(self, nodes, tour):
 		'''
 		nodes:(city_t,xy), tour:(city_t)
 		l(= total distance) = l(0-1) + l(1-2) + l(2-3) + ... + l(18-19) + l(19-0) @20%20->0
+		return l:(1)
 		'''
 		l = 0
 		for i in range(self.city_t):
@@ -88,6 +125,9 @@ class Env_tsp():
 		return l
 
 	def get_random_tour(self):
+		'''
+		return tour:(city_t)
+		'''
 		tour = []
 		while set(tour) != set(range(self.city_t)):
 			city = np.random.randint(self.city_t)

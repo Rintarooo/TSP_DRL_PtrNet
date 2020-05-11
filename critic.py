@@ -34,7 +34,6 @@ class PtrNet2(nn.Module):
 	def forward(self, x):
 		batch, city_t, xy = x.size()
 		embed_enc_inputs = self.Embedding(x)
-		already_played_action_mask = torch.zeros(batch, city_t)
 		enc_h, (dec_h0, dec_c0) = self.Encoder(embed_enc_inputs, None)
 		hidden = enc_h.size(2)
 		dec_state = (dec_h0, dec_c0)
