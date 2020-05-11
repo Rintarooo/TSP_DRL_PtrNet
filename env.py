@@ -63,7 +63,7 @@ class Env_tsp():
 			end_pos	= (nodes[tour[(i+1)%self.city_t],0], nodes[tour[(i+1)%self.city_t],1])
 			plt.annotate(str(tour[i].detach().numpy()), xy=end_pos, xycoords='data',
 							xytext=start_pos, textcoords='data',
-							arrowprops=dict(arrowstyle='->', connectionstyle='arc3'))
+							arrowprops=dict(arrowstyle='<->', connectionstyle='arc3'))
 		plt.show()
 	
 	def shuffle_index(self, inputs):

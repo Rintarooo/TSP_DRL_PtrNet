@@ -49,7 +49,7 @@ def train(cfg, env, log_path = None):
 		act_lr_scheduler.step()
 		
 		if i % 10 == 0:
-			print('step:%d, actic loss:%f\n'%(i, act_loss))
+			print('step:%d, actic loss:%1.3f\n'%(i, act_loss))
 			
 		if cfg.islogger:
 			if i % cfg.log_step == 0:
@@ -59,7 +59,7 @@ def train(cfg, env, log_path = None):
 						f.write('step,actic loss,critic loss,distance\n')
 				else:
 					with open(log_path, 'a') as f:
-						f.write('%d,%f,%f,%f\n'%(i, act_loss, crit_loss,real_l))
+						f.write('%d,%1.4f,%1.4f, %1.4f\n'%(i, act_loss, crit_loss,real_l))
 						
 				if cfg.issaver:		
 					torch.save(act_model.state_dict(), cfg.model_dir + '%s_step%d_act.pt'%(date, i))#'cfg.model_dir = ./Pt/'

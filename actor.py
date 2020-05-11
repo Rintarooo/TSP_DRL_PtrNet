@@ -21,6 +21,7 @@ class PtrNet1(nn.Module):
 		'''
 		self._initialize_weights(cfg.init_min, cfg.init_max)
 		self.clip_logits = cfg.clip_logits
+		self.softmax_T = cfg.softmax_T
 	
 	def _initialize_weights(self, init_min, init_max):
 		for param in self.parameters():
@@ -53,9 +54,9 @@ class PtrNet1(nn.Module):
 		pred_tour = torch.stack(pred_tour_list, dim = 1)
 		'''
 		a list of tensors -> pred_tour;tensor(batch,city_t)
-		pred_tour = torch.LongTensor(pred_tour_list)#pred_tour = torch.tensor(pred_tour_list)
-		for i in range(city_t):
-			neg_log += self.CEL(input = logits, target = pred_tour[:,i])
+		# ~ pred_tour = torch.LongTensor(pred_tour_list)#pred_tour = torch.tensor(pred_tour_list)
+		# ~ for i in range(city_t):
+			# ~ neg_log += self.CEL(input = logits, target = pred_tour[:,i])
 		'''
 		return pred_tour, neg_log 
 	
@@ -82,7 +83,7 @@ class PtrNet1(nn.Module):
 		'''
 		mask: model only points at cities that have yet to be visited, so prevent them from being reselected
 		'''
-		a = F.softmax(u, dim = 1)
+		a = F.softmax(u / self.softmax_T, dim = 1)
 		d = torch.einsum('bc,bce->be', a, embed_enc_inputs)
 		d = torch.unsqueeze(d, dim = 1)
 		return u,a,d
