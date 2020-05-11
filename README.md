@@ -1,7 +1,7 @@
 ## Actor-Critic algorithm to train the Pointer Networks on TSP without supervised solution
 This is implementation of [NEURAL COMBINATORIAL OPTIMIZATION WITH REINFORCEMENT LEARNING](Bello et al, 2016)(https://arxiv.org/abs/1611.09940).
 
-# This code is still in progress
+## The code is still in progress
 
 In this work, we tackle Traveling Salesman Problem(TSP), which is one of the combinatorial optimization problems known as NP-hard. TSP seeks for the shortest tour for a salesman to visit each city exactly once.
 
