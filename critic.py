@@ -24,8 +24,6 @@ class PtrNet2(nn.Module):
 					nn.ReLU(),
 					nn.Linear(cfg.hidden, 1, bias = False))
 		self._initialize_weights(cfg.init_min, cfg.init_max)
-		self.clip_logits = cfg.clip_logits
-		
 	
 	def _initialize_weights(self, init_min, init_max):
 		for param in self.parameters():
@@ -71,7 +69,7 @@ class PtrNet2(nn.Module):
 		'''
 		u1 = self.W_ref(enc_h)
 		u2 = self.W_q(dec_h)
-		u = self.Vec(self.clip_logits * torch.tanh(u1 + u2))
+		u = self.Vec(torch.tanh(u1 + u2))
 		u = torch.squeeze(u, dim = 2)
 		a = F.softmax(u, dim = 1)
 		d = torch.einsum('bc,bch->bh', a, enc_h)

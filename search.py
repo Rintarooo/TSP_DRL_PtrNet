@@ -80,7 +80,7 @@ def active_search(cfg, env, test_input, log_path = None):
 		if cfg.islogger:
 			if i % cfg.log_step == 0:
 				if log_path is None:
-					log_path = cfg.log_dir + 'test_%s.csv'%(date)#cfg.log_dir = ./Csv/
+					log_path = cfg.log_dir + 'active_search_%s.csv'%(date)#cfg.log_dir = ./Csv/
 					with open(log_path, 'w') as f:
 						f.write('step,actic loss,minimum distance\n')
 				else:

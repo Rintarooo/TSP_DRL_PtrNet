@@ -1,5 +1,4 @@
 import torch
-import torchvision
 import numpy as np
 import math
 import itertools
@@ -97,7 +96,7 @@ class Env_tsp():
 		pred_shuffle_tours:(batch,city_t)
 		shuffle_inputs:(batch,city_t_t,xy)
 		test_inputs:(batch,city_t,xy)
-		return pred_tours:(city_t)
+		return pred_tours:(batch,city_t)
 		'''
 		pred_tours = []
 		for i in range(self.batch):
