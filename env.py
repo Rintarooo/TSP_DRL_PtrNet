@@ -60,23 +60,14 @@ class Env_tsp():
 		return l_batch	
 		
 	def show(self, nodes, tour):
-		'''
-		plt.annotate
-		->arrow goes towards xy=end_pos from xytext=start_pos where comment is put down
-		-ref
-		http://tanukigraph.hatenablog.com/entry/2017/12/25/224725
-		'''
 		print('distance:{:.3f}'.format(self.get_tour_distance(nodes, tour)))	
 		print(tour)
 		
 		plt.figure()
 		plt.plot(nodes[:,0], nodes[:,1], 'yo', markersize = 16)
+		plt.plot(nodes[tour[:].detach().numpy(), 0], nodes[tour[:].detach().numpy(), 1], 'k-', linewidth = 0.7)
 		for i in range(self.city_t):
-			start_pos = (nodes[tour[i],0], nodes[tour[i],1])
-			end_pos	= (nodes[tour[(i+1)%self.city_t],0], nodes[tour[(i+1)%self.city_t],1])
-			plt.annotate(str(tour[i].detach().numpy()), xy=end_pos, xycoords='data',
-							xytext=start_pos, textcoords='data',
-							arrowprops=dict(arrowstyle='<->', connectionstyle='arc3'))
+			plt.text(nodes[i,0], nodes[i,1], str(i), size = 10, color = 'b')
 		plt.show()
 	
 	def shuffle(self, inputs):
