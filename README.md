@@ -17,4 +17,5 @@ Critic: Estimates the state-value
 
 ## Active Search
 In this paper, two approaches to find the best tour at inference time are proposed, which we refer to as Sampling and Active Search. Search strategy called Active Search takes actor model and use policy gradient for updating its parameters to find the shortest tour.
-![Figure_1](https://user-images.githubusercontent.com/51239551/81577550-8451c780-93e4-11ea-8ab3-3b412caf1fcb.png)
+
+![Figure_13png](https://user-images.githubusercontent.com/51239551/82798619-bae31400-9eb3-11ea-9cf4-59f1c0a49a88.png)
