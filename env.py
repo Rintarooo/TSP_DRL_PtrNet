@@ -62,10 +62,12 @@ class Env_tsp():
 	def show(self, nodes, tour):
 		print('distance:{:.3f}'.format(self.get_tour_distance(nodes, tour)))	
 		print(tour)
-		
 		plt.figure()
 		plt.plot(nodes[:,0], nodes[:,1], 'yo', markersize = 16)
-		plt.plot(nodes[tour[:].detach().numpy(), 0], nodes[tour[:].detach().numpy(), 1], 'k-', linewidth = 0.7)
+		np_tour = tour[:].detach().numpy()
+		np_fin_tour = [tour[-1].detach().item(), tour[0].detach().item()]
+		plt.plot(nodes[np_tour, 0], nodes[np_tour, 1], 'k-', linewidth = 0.7)
+		plt.plot(nodes[np_fin_tour, 0], nodes[np_fin_tour, 1], 'k-', linewidth = 0.7)
 		for i in range(self.city_t):
 			plt.text(nodes[i,0], nodes[i,1], str(i), size = 10, color = 'b')
 		plt.show()

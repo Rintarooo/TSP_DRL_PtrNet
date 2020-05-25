@@ -22,11 +22,11 @@ def search_tour(cfg, env):
 	# ~ t2 = time()
 	# ~ print('active search:%dmin %1.2fsec\n'%((t2-t1)//60, (t2-t1)%60))
 	
-	# t1 = time()
-	# optimal_tour = env.get_optimal_tour(test_input)
-	# env.show(test_input, optimal_tour)
-	# t2 = time()
-	# print('optimal solution:%dmin %1.2fsec\n'%((t2-t1)//60, (t2-t1)%60))
+	t1 = time()
+	optimal_tour = env.get_optimal_tour(test_input)
+	env.show(test_input, optimal_tour)
+	t2 = time()
+	print('optimal solution:%dmin %1.2fsec\n'%((t2-t1)//60, (t2-t1)%60))
 	
 if __name__ == '__main__':
 	cfg = load_pkl(pkl_parser().p)
