@@ -1,5 +1,6 @@
 import torch
 from time import time
+import sys
 from env import Env_tsp
 from config import Config, load_pkl, pkl_parser
 from search import sampling, active_search
@@ -50,3 +51,7 @@ if __name__ == '__main__':
 		
 	elif cfg.mode == 'test':
 		search_tour(cfg, env)
+
+	else :
+		sys.exit('train or test only')
+
