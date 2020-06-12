@@ -8,14 +8,12 @@ from actor import PtrNet1
 
 def sampling(cfg, env, test_input):
 	test_inputs = test_input.repeat(cfg.batch,1,1)
-	if os.path.exists(cfg.act_model_path):
-		act_model = torch.load(cfg.act_model_path)
-	else:
-		act_model = PtrNet1(cfg)
 	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+	act_model = PtrNet1(cfg)
+	if os.path.exists(cfg.act_model_path):	
+		act_model.load_state_dict(torch.load(cfg.act_model_path, map_location = device))
 	act_model = act_model.to(device)
-	test_inputs.to(device)
-	pred_tours, _ = act_model(test_inputs)
+	pred_tours, _ = act_model(test_inputs, device)
 	l_batch = env.stack_l(test_inputs, pred_tours)
 	index_lmin = torch.argmin(l_batch)
 	best_tour = pred_tours[index_lmin]
@@ -32,26 +30,27 @@ def active_search(cfg, env, test_input, log_path = None):
 	baseline = env.stack_l(test_inputs, random_tours)
 	l_min = baseline[0]
 	
-	if os.path.exists(cfg.act_model_path):
-		act_model = torch.load(cfg.act_model_path)
-	else:
-		act_model = PtrNet1(cfg)	
-	
+	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+	act_model = PtrNet1(cfg)
+	if os.path.exists(cfg.act_model_path):	
+		act_model.load_state_dict(torch.load(cfg.act_model_path, map_location = device))
+		
 	if cfg.optim == 'Adam':
 		act_optim = optim.Adam(act_model.parameters(), lr = cfg.lr)
 	
-	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 	act_model = act_model.to(device)
+	baseline = baseline.to(device)
+
 	for i in tqdm(range(cfg.steps)):
 		'''
 		- page 6/15 in papar
 		we randomly shuffle the input sequence before feeding it to our pointer network. 
 		This increases the stochasticity of the sampling procedure and leads to large improvements in Active Search.
 		'''
+		test_inputs = test_inputs.to(device)
 		shuffle_inputs = env.shuffle(test_inputs)
-		shuffle_inputs.to(device)
-		pred_shuffle_tours, neg_log = act_model(shuffle_inputs)
-		pred_tours = env.back_tours(pred_shuffle_tours, shuffle_inputs, test_inputs)
+		pred_shuffle_tours, neg_log = act_model(shuffle_inputs, device)
+		pred_tours = env.back_tours(pred_shuffle_tours, shuffle_inputs, test_inputs, device)
 		
 		l_batch = env.stack_l(test_inputs, pred_tours)
 		

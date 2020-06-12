@@ -15,9 +15,6 @@ class PtrNet1(nn.Module):
 		self.CEL = nn.CrossEntropyLoss(reduction = 'none')
 		'''
 		This criterion combines "log_softmax" and "nll(negative log likelihood)_loss" in a single function
-		-ref CEL in pytorch
-		https://stackoverflow.com/questions/5557x7519/whats-the-equivalent-of-tf-nn-softmax-cross-entropy-with-logits-in-pytorch
-		https://stackoverflow.com/questions/49390842/cross-entropy-in-pytorch
 		'''
 		self._initialize_weights(cfg.init_min, cfg.init_max)
 		self.clip_logits = cfg.clip_logits
@@ -27,15 +24,16 @@ class PtrNet1(nn.Module):
 		for param in self.parameters():
 			param.data.uniform_(init_min, init_max)
 			
-	def forward(self, x):
+	def forward(self, x, device):
+		x = x.to(device)
 		batch, city_t, xy = x.size()
 		embed_enc_inputs = self.Embedding(x)
 		embed = embed_enc_inputs.size(2)
-		already_played_action_mask = torch.zeros(batch, city_t)
+		already_played_action_mask = torch.zeros(batch, city_t).to(device)
 		enc_h, (dec_h0, dec_c0) = self.Encoder(embed_enc_inputs, None)
 		dec_state = (dec_h0, dec_c0)
 		pred_tour_list, neg_log = [], 0
-		dec_i1 = torch.rand(batch, 1, embed)
+		dec_i1 = torch.rand(batch, 1, embed).to(device)
 		for i in range(city_t):
 			dec_h, dec_state = self.Decoder(dec_i1, dec_state)
 			logits, probs, dec_i1 = self.pointing_mechanism(
@@ -48,7 +46,7 @@ class PtrNet1(nn.Module):
 			logits(batch,city_t) -> next_city_index(batch);value:0 ~ 20
 			neg_log is for calculating log part of gradient policy equation 
 			'''
-			already_played_action_mask += torch.zeros(batch,city_t).scatter_(
+			already_played_action_mask += torch.zeros(batch,city_t).to(device).scatter_(
 							dim = 1, index = torch.unsqueeze(next_city_index, dim = 1),value = 1)
 		
 		pred_tour = torch.stack(pred_tour_list, dim = 1)
@@ -89,7 +87,7 @@ class PtrNet1(nn.Module):
 		return u,a,d
 				
 if __name__ == '__main__':
-	cfg = load_pkl(pkl_parser().p)
+	cfg = load_pkl(pkl_parser().path)
 	model = PtrNet2(cfg)
 	inputs = torch.randn(3,20,2)	
 	pred_tour, neg_log = model(inputs)	

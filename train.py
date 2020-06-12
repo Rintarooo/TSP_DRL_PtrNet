@@ -6,7 +6,8 @@ from datetime import datetime
 from actor import PtrNet1
 from critic import PtrNet2
 
-def train(cfg, env, log_path = None):
+def train_model(cfg, env, log_path = None):
+	torch.autograd.set_detect_anomaly(True)
 	date = datetime.now().strftime('%m%d_%H_%M')
 	act_model = PtrNet1(cfg)
 	if cfg.optim == 'Adam':
@@ -14,12 +15,12 @@ def train(cfg, env, log_path = None):
 	act_lr_scheduler = optim.lr_scheduler.StepLR(act_optim, 
 					step_size=cfg.lr_decay_step, gamma=cfg.lr_decay)
 
-	cri_model = PtrNet2()
+	cri_model = PtrNet2(cfg)
 	if cfg.optim == 'Adam':
 		cri_optim = optim.Adam(cri_model.parameters(), lr = cfg.lr)
 	cri_lr_scheduler = optim.lr_scheduler.StepLR(cri_optim, 
 					step_size = cfg.lr_decay_step, gamma = cfg.lr_decay)
-	cri_loss_func = nn.MSEloss()
+	cri_loss_func = nn.MSELoss()
 	
 	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 	act_model, cri_model = act_model.to(device), cri_model.to(device)
@@ -27,9 +28,9 @@ def train(cfg, env, log_path = None):
 	for i in tqdm(range(cfg.steps)):
 		inputs = env.stack_nodes()
 		inputs = inputs.to(device)
-		pred_tour, neg_log = act_model(inputs)
-		real_l = env.stacl_l(inputs, pred_tour)
-		pred_l = cri_model(inputs)
+		pred_tour, neg_log = act_model(inputs, device)
+		real_l = env.stack_l(inputs, pred_tour)
+		pred_l = cri_model(inputs, device)
 		cri_optim.zero_grad()
 		cri_loss = cri_loss_func(pred_l, real_l)
 		cri_loss.backward()
@@ -39,8 +40,7 @@ def train(cfg, env, log_path = None):
 		'''
 		cri_optim.step()
 		cri_lr_scheduler.step()
-		
-		adv = real_l - pred_l
+		adv = pred_l.detach() - real_l# detach();requires_grad = False, prevents the gradient for advantage, actor-model from going into critic-model
 		act_optim.zero_grad()
 		act_loss = torch.mean(adv * neg_log)
 		act_loss.backward()
@@ -50,17 +50,17 @@ def train(cfg, env, log_path = None):
 		
 		if i % 10 == 0:
 			print('step:%d, actic loss:%1.3f\n'%(i, act_loss))
-			
-		if cfg.islogger:
-			if i % cfg.log_step == 0:
+		
+		if i % cfg.log_step == 0:	
+			if cfg.islogger:
 				if log_path is None:
 					log_path = cfg.log_dir + 'test_%s.csv'%(date)#cfg.log_dir = ./Csv/
 					with open(log_path, 'w') as f:
 						f.write('step,actic loss,critic loss,distance\n')
 				else:
 					with open(log_path, 'a') as f:
-						f.write('%d,%1.4f,%1.4f, %1.4f\n'%(i, act_loss, crit_loss,real_l))
+						f.write('%d,%1.4f,%1.4f, %1.4f\n'%(i, act_loss.item(), cri_loss.item(),real_l[0]))
 						
-				if cfg.issaver:		
-					torch.save(act_model.state_dict(), cfg.model_dir + '%s_step%d_act.pt'%(date, i))#'cfg.model_dir = ./Pt/'
-					torch.save(cri_model.state_dict(), cfg.model_dir + '%s_step%d_cri.pt'%(date, i))		
+			if cfg.issaver:		
+				torch.save(act_model.state_dict(), cfg.model_dir + '%s_step%d_act.pt'%(date, i))#'cfg.model_dir = ./Pt/'
+				# torch.save(cri_model.state_dict(), cfg.model_dir + '%s_step%d_cri.pt'%(date, i))		

@@ -16,8 +16,8 @@ def get_2city_distance(n1, n2):
 class Env_tsp():
 	def __init__(self, cfg):
 		'''
-		nodes(cities) : contains all the nodes and their 2 dimensional coordinates 
-		[n,2] dimension array e.g. [[0.5,0.7],[0.2,0.3]]
+		nodes(cities) : contains nodes and their 2 dimensional coordinates 
+		[city_t, xy] = [3,2] dimension array e.g. [[0.5,0.7],[0.2,0.3],[0.4,0.1]]
 		'''
 		self.batch = cfg.batch
 		self.city_t = cfg.city_t
@@ -64,8 +64,8 @@ class Env_tsp():
 		print(tour)
 		plt.figure()
 		plt.plot(nodes[:,0], nodes[:,1], 'yo', markersize = 16)
-		np_tour = tour[:].detach().numpy()
-		np_fin_tour = [tour[-1].detach().item(), tour[0].detach().item()]
+		np_tour = tour[:].cpu().detach()
+		np_fin_tour = [tour[-1].item(), tour[0].item()]
 		plt.plot(nodes[np_tour, 0], nodes[np_tour, 1], 'k-', linewidth = 0.7)
 		plt.plot(nodes[np_fin_tour, 0], nodes[np_fin_tour, 1], 'k-', linewidth = 0.7)
 		for i in range(self.city_t):
@@ -84,7 +84,7 @@ class Env_tsp():
 			shuffle_inputs[i,:,:] = inputs[i,perm,:]
 		return shuffle_inputs
 		
-	def back_tours(self, pred_shuffle_tours, shuffle_inputs, test_inputs):
+	def back_tours(self, pred_shuffle_tours, shuffle_inputs, test_inputs, device):
 		'''
 		pred_shuffle_tours:(batch,city_t)
 		shuffle_inputs:(batch,city_t_t,xy)
@@ -95,7 +95,7 @@ class Env_tsp():
 		for i in range(self.batch):
 			pred_tour = []
 			for j in range(self.city_t):
-				xy_temp = shuffle_inputs[i, pred_shuffle_tours[i, j]]
+				xy_temp = shuffle_inputs[i, pred_shuffle_tours[i, j]].to(device)
 				for k in range(self.city_t):
 					if torch.all(torch.eq(xy_temp, test_inputs[i,k])):
 						pred_tour.append(torch.tensor(k))

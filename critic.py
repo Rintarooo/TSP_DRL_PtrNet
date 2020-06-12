@@ -13,15 +13,9 @@ class PtrNet2(nn.Module):
 		self.W_q = nn.Linear(cfg.hidden, cfg.hidden, bias = False)
 		self.W_ref = nn.Linear(cfg.hidden, cfg.hidden, bias = False)
 		self.CEL = nn.CrossEntropyLoss(reduction = 'none')
-		'''
-		This criterion combines "log_softmax" and "nll(negative log likelihood)_loss" in a single function
-		-ref CEL in pytorch
-		https://stackoverflow.com/questions/5557x7519/whats-the-equivalent-of-tf-nn-softmax-cross-entropy-with-logits-in-pytorch
-		https://stackoverflow.com/questions/49390842/cross-entropy-in-pytorch
-		'''
 		self.final2FC = nn.Sequential(
 					nn.Linear(cfg.hidden, cfg.hidden, bias = False),
-					nn.ReLU(),
+					nn.ReLU(inplace = False),
 					nn.Linear(cfg.hidden, 1, bias = False))
 		self._initialize_weights(cfg.init_min, cfg.init_max)
 	
@@ -29,13 +23,14 @@ class PtrNet2(nn.Module):
 		for param in self.parameters():
 			param.data.uniform_(init_min, init_max)
 			
-	def forward(self, x):
+	def forward(self, x, device):
+		x = x.to(device)
 		batch, city_t, xy = x.size()
 		embed_enc_inputs = self.Embedding(x)
 		enc_h, (dec_h0, dec_c0) = self.Encoder(embed_enc_inputs, None)
 		hidden = enc_h.size(2)
 		dec_state = (dec_h0, dec_c0)
-		dec_i1 = torch.rand(batch, 1, hidden)#hidden not embed
+		dec_i1 = torch.rand(batch, 1, hidden).to(device)#hidden not embed
 		for i in range(city_t):
 			dec_h, dec_state = self.LSTMprocess_block(dec_i1, dec_state)
 			dec_i1 = self.attending_mechanism(enc_h, dec_h)
@@ -48,16 +43,11 @@ class PtrNet2(nn.Module):
 		
 		dec_h(batch,1,hidden)*FC(hidden,hidden)*FC(hidden,1) -> pred_l(batch,1,1) ->pred_l(batch)
 		'''
-		pred_l = self.final2FC(dec_h)
-		pred_l = pred_l.squeeze(-1).squeeze(-1)	
+		pred_l = self.final2FC(dec_h).squeeze(1).squeeze(1)
 		return pred_l 
 	
 	def attending_mechanism(self, enc_h, dec_h):
 		'''
-		-ref about torch.bmm, torch.matmul and so on
-		https://qiita.com/tand826/items/9e1b6a4de785097fe6a5
-		https://qiita.com/shinochin/items/aa420e50d847453cc296
-		
 		b:batch, c:city_t(time squence), e:embedding_size, h:hidden_size
 		enc_h(bch)*W_ref(hh) = u1(bch)
 		dec_h(b1h)*W_q(hh) = u2(b1h)
@@ -77,10 +67,12 @@ class PtrNet2(nn.Module):
 		return d
 				
 if __name__ == '__main__':
-	cfg = load_pkl(pkl_parser().p)
+	cfg = load_pkl(pkl_parser().path)
 	model = PtrNet2(cfg)
-	inputs = torch.randn(3,20,2)	
-	pred_l = model(inputs)	
+	inputs = torch.randn(3,20,2)
+	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')	
+	model = model.to(device)
+	pred_l = model(inputs, device)	
 	print(pred_l.size())
 	print('pred_length:', pred_l)
 	
