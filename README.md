@@ -1,9 +1,9 @@
 # TSP Solver with Deep Reinforcement Learning 
-This is PyTorch implementation of NEURAL COMBINATORIAL OPTIMIZATION WITH REINFORCEMENT LEARNING(Bello et al. 2016)
-
-(https://arxiv.org/abs/1611.09940).
+This is PyTorch implementation of NEURAL COMBINATORIAL OPTIMIZATION WITH REINFORCEMENT LEARNING(Bello et al. 2016(https://arxiv.org/abs/1611.09940).
 
 Pointer Networks(PN) is introduced by Vinyals et al. 2015(https://arxiv.org/abs/1506.03134). This model uses attention to output a permutation of the input index.
+
+
 ![Screen Shot 2020-05-12 at 12 15 35 AM](https://user-images.githubusercontent.com/51239551/81578424-bf082f80-93e5-11ea-812a-914c9046587a.png)
 
 ## Actor-Critic Algorithm to train PN on TSP without supervised solution
