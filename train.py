@@ -54,7 +54,7 @@ def train_model(cfg, env, log_path = None):
 		if i % cfg.log_step == 0:	
 			if cfg.islogger:
 				if log_path is None:
-					log_path = cfg.log_dir + 'test_%s.csv'%(date)#cfg.log_dir = ./Csv/
+					log_path = cfg.log_dir + 'train_%s.csv'%(date)#cfg.log_dir = ./Csv/
 					with open(log_path, 'w') as f:
 						f.write('step,actic loss,critic loss,distance\n')
 				else:
