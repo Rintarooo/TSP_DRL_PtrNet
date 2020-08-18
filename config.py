@@ -40,6 +40,8 @@ class Config():
 			self.__dict__[k] = v
 		self.task = 'TSP%d'%self.city_t
 		self.pkl_path = self.pkl_dir + '%s.pkl'%self.mode
+		for x in [self.log_dir, self.model_dir, self.pkl_dir]:
+			os.makedirs(x, exist_ok = True)
 		
 def dump_pkl(args):
 	cfg = Config(**vars(args))

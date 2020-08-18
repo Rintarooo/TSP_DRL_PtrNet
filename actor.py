@@ -88,9 +88,9 @@ class PtrNet1(nn.Module):
 				
 if __name__ == '__main__':
 	cfg = load_pkl(pkl_parser().path)
-	model = PtrNet2(cfg)
+	model = PtrNet1(cfg)
 	inputs = torch.randn(3,20,2)	
-	pred_tour, neg_log = model(inputs)	
+	pred_tour, neg_log = model(inputs, device = 'cpu')	
 	print(pred_tour.size())
 	print('pred_tour:', pred_tour)
 	print(neg_log.size())
