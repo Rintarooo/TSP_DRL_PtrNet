@@ -2,96 +2,134 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from config import Config, load_pkl, pkl_parser
+from layers import Attention
 
+# https://github.com/higgsfield/np-hard-deep-reinforcement-learning/blob/master/Neural%20Combinatorial%20Optimization.ipynb
 class PtrNet1(nn.Module):
 	def __init__(self, cfg):
 		super().__init__()
-		self.Embedding = nn.Linear(cfg.xy, cfg.embed, bias = False)
+		self.Embedding = nn.Linear(2, cfg.embed, bias = False)
 		self.Encoder = nn.LSTM(input_size = cfg.embed, hidden_size = cfg.hidden, batch_first = True)
 		self.Decoder = nn.LSTM(input_size = cfg.embed, hidden_size = cfg.hidden, batch_first = True)
-		self.Vec = nn.Linear(cfg.hidden, 1, bias = False)
-		self.W_q = nn.Linear(cfg.hidden, cfg.hidden, bias = False)
-		self.W_ref = nn.Linear(cfg.hidden, cfg.hidden, bias = False)
-		self.CEL = nn.CrossEntropyLoss(reduction = 'none')
-		'''
-		This criterion combines "log_softmax" and "nll(negative log likelihood)_loss" in a single function
-		'''
+		if torch.cuda.is_available():
+			self.Vec = nn.Parameter(torch.cuda.FloatTensor(cfg.embed))
+			self.Vec2 = nn.Parameter(torch.cuda.FloatTensor(cfg.embed))
+		else:
+			self.Vec = nn.Parameter(torch.FloatTensor(cfg.embed))
+			self.Vec2 = nn.Parameter(torch.FloatTensor(cfg.embed))
+		self.W_q = nn.Linear(cfg.hidden, cfg.hidden, bias = True)
+		self.W_ref = nn.Conv1d(cfg.hidden, cfg.hidden, 1, 1)
+		self.W_q2 = nn.Linear(cfg.hidden, cfg.hidden, bias = True)
+		self.W_ref2 = nn.Conv1d(cfg.hidden, cfg.hidden, 1, 1)
+		self.dec_input = nn.Parameter(torch.FloatTensor(cfg.embed))
 		self._initialize_weights(cfg.init_min, cfg.init_max)
 		self.clip_logits = cfg.clip_logits
 		self.softmax_T = cfg.softmax_T
+		self.n_glimpse = 1
 	
-	def _initialize_weights(self, init_min, init_max):
+	def _initialize_weights(self, init_min = -0.08, init_max = 0.08):
 		for param in self.parameters():
-			param.data.uniform_(init_min, init_max)
+			nn.init.uniform_(param.data, init_min, init_max)
 			
 	def forward(self, x, device):
+		''' x: (batch, city_t, 2)
+			enc_h: (batch, city_t, embed)
+			dec_input: (batch, 1, embed)
+			h: (1, batch, embed)
+			return: pi: (batch, city_t), ll: (batch)
+		'''
 		x = x.to(device)
-		batch, city_t, xy = x.size()
+		batch, city_t, _ = x.size()
 		embed_enc_inputs = self.Embedding(x)
 		embed = embed_enc_inputs.size(2)
-		already_played_action_mask = torch.zeros(batch, city_t).to(device)
-		enc_h, (dec_h0, dec_c0) = self.Encoder(embed_enc_inputs, None)
-		dec_state = (dec_h0, dec_c0)
-		pred_tour_list, neg_log = [], 0
-		dec_i1 = torch.rand(batch, 1, embed).to(device)
+		mask = torch.zeros(batch, city_t).to(device)
+		enc_h, (h, c) = self.Encoder(embed_enc_inputs, None)
+		pi_list, log_ps = [], []
+		dec_input = self.dec_input.unsqueeze(0).repeat(batch,1).unsqueeze(1).to(device)
 		for i in range(city_t):
-			dec_h, dec_state = self.Decoder(dec_i1, dec_state)
-			logits, probs, dec_i1 = self.pointing_mechanism(
-								enc_h, dec_h, embed_enc_inputs, already_played_action_mask)
-			next_city_index = torch.argmax(logits, dim=1)
-			pred_tour_list.append(next_city_index)
-			neg_log += self.CEL(input = logits, target = next_city_index)
-			'''
-			input(batch, class), target(batch);target value:0 ~ class-1)
-			logits(batch,city_t) -> next_city_index(batch);value:0 ~ 20
-			neg_log is for calculating log part of gradient policy equation 
-			'''
-			already_played_action_mask += torch.zeros(batch,city_t).to(device).scatter_(
-							dim = 1, index = torch.unsqueeze(next_city_index, dim = 1),value = 1)
-		
-		pred_tour = torch.stack(pred_tour_list, dim = 1)
-		'''
-		a list of tensors -> pred_tour;tensor(batch,city_t)
-		# ~ pred_tour = torch.LongTensor(pred_tour_list)#pred_tour = torch.tensor(pred_tour_list)
-		# ~ for i in range(city_t):
-			# ~ neg_log += self.CEL(input = logits, target = pred_tour[:,i])
-		'''
-		return pred_tour, neg_log 
+			_, (h, c) = self.Decoder(dec_input, (h, c))
+			query, ref = h.squeeze(0), enc_h
+			for i in range(self.n_glimpse):
+				query = self.glimpse(query, ref, mask)
+			logits, dec_input = self.pointer(query, ref, mask)	
+			log_p = torch.log_softmax(logits, dim = -1)
+			# next_node = torch.argmax(log_p, dim = 1).type(torch.long)
+			next_node = torch.multinomial(log_p.exp(), 1).type(torch.long).squeeze(1)
+			
+			pi_list.append(next_node)
+			log_ps.append(log_p)
+			mask += torch.zeros(batch,city_t).to(device).scatter_(dim = 1, index = next_node.unsqueeze(1), value = 1)
+			
+		pi = torch.stack(pi_list, dim = 1)
+		ll = self.get_log_likelihood(torch.stack(log_ps, 1), pi)
+		return pi, ll 
 	
-	def pointing_mechanism(self, enc_h, dec_h, embed_enc_inputs, 
-						already_played_action_mask, infinity = 1e7):
-		'''
-		-ref about torch.bmm, torch.matmul and so on
-		https://qiita.com/tand826/items/9e1b6a4de785097fe6a5
-		https://qiita.com/shinochin/items/aa420e50d847453cc296
-		
-		b:batch, c:city_t(time squence), e:embedding_size, h:hidden_size
-		enc_h(bch)*W_ref(hh) = u1(bch)
-		dec_h(b1h)*W_q(hh) = u2(b1h)
-		tanh(bch)*Vec(h1) = u(bc1)
-		u(bc1) -> u(bc)-already(bc) = u(bc)
-		u(bc) -> a(bc)
-		a(bc)*emb(bce) = d(be)
-		d(be) -> d(b1e)
-		'''
-		u1 = self.W_ref(enc_h)
-		u2 = self.W_q(dec_h)
-		u = self.Vec(self.clip_logits * torch.tanh(u1 + u2))
-		u = torch.squeeze(u, dim = 2) - infinity * already_played_action_mask
-		'''
-		mask: model only points at cities that have yet to be visited, so prevent them from being reselected
-		'''
+	def glimpse(self, query, ref, mask, infinity = 1e8):
+		"""	-ref about torch.bmm, torch.matmul and so on
+			https://qiita.com/tand826/items/9e1b6a4de785097fe6a5
+			https://qiita.com/shinochin/items/aa420e50d847453cc296
+			
+			Args: 
+			query: is the hidden state of the decoder at the current
+				(batch, 128)
+			ref: the set of hidden states from the encoder. 
+				(batch, city_t, 128)
+			mask: model only points at cities that have yet to be visited, so prevent them from being reselected
+				(batch, city_t)
+		"""
+		u1 = self.W_q(query).unsqueeze(-1).repeat(1,1,ref.size(1))# u1: (batch, 128, city_t)
+		u2 = self.W_ref(ref.permute(0,2,1))# u2: (batch, 128, city_t)
+		V = self.Vec.unsqueeze(0).unsqueeze(0).repeat(ref.size(0), 1, 1)
+		u = torch.bmm(V, torch.tanh(u1 + u2)).squeeze(1)
+		# V: (batch, 1, 128) * u1+u2: (batch, 128, city_t) => u: (batch, 1, city_t) => (batch, city_t)
+		u = u - infinity * mask
 		a = F.softmax(u / self.softmax_T, dim = 1)
-		d = torch.einsum('bc,bce->be', a, embed_enc_inputs)
-		d = torch.unsqueeze(d, dim = 1)
-		return u,a,d
+		d = torch.bmm(u2, a.unsqueeze(2)).squeeze(2)
+		# u2: (batch, 128, city_t) * a: (batch, city_t, 1) => d: (batch, 128)
+		return d
+
+	def pointer(self, query, ref, mask, infinity = 1e8):
+		"""	Args: 
+			query: is the hidden state of the decoder at the current
+				(batch, 128)
+			ref: the set of hidden states from the encoder. 
+				(batch, city_t, 128)
+			mask: model only points at cities that have yet to be visited, so prevent them from being reselected
+				(batch, city_t)
+		"""
+		u1 = self.W_q2(query).unsqueeze(-1).repeat(1,1,ref.size(1))# u1: (batch, 128, city_t)
+		u2 = self.W_ref2(ref.permute(0,2,1))# u2: (batch, 128, city_t)
+		V = self.Vec2.unsqueeze(0).unsqueeze(0).repeat(ref.size(0), 1, 1)
+		u = torch.bmm(V, self.clip_logits * torch.tanh(u1 + u2)).squeeze(1)
+		# V: (batch, 1, 128) * u1+u2: (batch, 128, city_t) => u: (batch, 1, city_t) => (batch, city_t)
+		u = u - infinity * mask
+		a = F.softmax(u / self.softmax_T, dim = 1)
+		d = torch.bmm(u2, a.unsqueeze(2)).squeeze(2)
+		return u, d.unsqueeze(1) 
+
+	def get_log_likelihood(self, _log_p, pi):
+		""" args:
+			_log_p: (batch, city_t, city_t)
+			pi: (batch, city_t), predicted tour
+			return: (batch)
+		"""
+		log_p = torch.gather(input = _log_p, dim = 2, index = pi[:,:,None])
+		return torch.sum(log_p.squeeze(-1), 1)
 				
 if __name__ == '__main__':
 	cfg = load_pkl(pkl_parser().path)
 	model = PtrNet1(cfg)
 	inputs = torch.randn(3,20,2)	
-	pred_tour, neg_log = model(inputs, device = 'cpu')	
-	print(pred_tour.size())
-	print('pred_tour:', pred_tour)
-	print(neg_log.size())
-	print('neg_log:', neg_log)
+	pi, ll = model(inputs, device = 'cpu')	
+	print('pi:', pi.size(), pi)
+	print('log_likelihood:', ll.size(), ll)
+
+	cnt = 0
+	for i, k in model.state_dict().items():
+		print(i, k.size(), torch.numel(k))
+		cnt += torch.numel(k)	
+	print('total parameters:', cnt)
+
+	# ll.mean().backward()
+	# print(model.W_q.weight.grad)
+	

@@ -4,7 +4,6 @@ import sys
 from env import Env_tsp
 from config import Config, load_pkl, pkl_parser
 from search import sampling, active_search
-from train import train_model
 	
 def search_tour(cfg, env):
 	test_input = env.get_nodes(cfg.seed)
@@ -51,12 +50,10 @@ if __name__ == '__main__':
 	# random_tour = env.get_random_tour()
 	# env.show(inputs[0], random_tour)
 
-	if cfg.mode == 'train':
-		train_model(cfg, env)
 		
-	elif cfg.mode == 'test':
+	if cfg.mode == 'test':
 		search_tour(cfg, env)
 
 	else:
-		sys.exit('train or test only')
+		sys.exit('test only, specify test pkl file')
 

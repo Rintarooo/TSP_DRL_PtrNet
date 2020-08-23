@@ -27,10 +27,11 @@ In this paper, two approaches to find the best tour at inference time are propos
 
 First generate the pickle file contaning hyperparameter values by running the following command.
 ```
-python config.py -m 'test' -ap 'Pt/0612_09_07_step1780_act.pt'
+python config.py -m '***'
 ```
-You may use my pre-trained weight which I've pulled out after 1780 epoch using default ./Pkl/train.pkl.
+*** should be train, train_emv or test
+You may use my pre-trained weight 
 ```
-python main.py -p './Pkl/test.pkl'
+python infer.py -p './Pkl/test.pkl'
 ```
 Take the pickle file in main.py

@@ -2,21 +2,22 @@ import pickle
 import os
 import argparse
 import torch
+from datetime import datetime
 
 def argparser():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-m', '--mode', metavar = 'M', type = str, default = 'test', choices = ['train', 'test'], help = 'train or test')
+	parser.add_argument('-m', '--mode', metavar = 'M', type = str, choices = ['train', 'train_emv', 'test'], help = 'train or train_emv or test')
 	parser.add_argument('--seed', metavar = 'SEED', type = int, default = 1, help = 'random seed number for inference, reproducibility')
-	parser.add_argument('-b', '--batch', metavar = 'B', type = int, default = 128, help = 'batch size')
-	parser.add_argument('--xy', metavar = 'XY', type = int, default = 2, help = 'xy coordinate size input size')
+	parser.add_argument('-b', '--batch', metavar = 'B', type = int, default = 512, help = 'batch size')
 	parser.add_argument('-ct', '--city_t', metavar = 'CT', type = int, default = 20, help = 'number of cities, time sequence')
 	parser.add_argument('-e', '--embed', metavar = 'EM', type = int, default = 128, help = 'embedding size')
 	parser.add_argument('-hi', '--hidden', metavar = 'HI', type = int, default = 128, help = 'hidden size')
 	parser.add_argument('-c', '--clip_logits', metavar = 'C', type = int, default = 10, help = 'improve exploration; clipping logits')
 	parser.add_argument('-st', '--softmax_T', metavar = 'T', type = float, default = 1.0, help = 'improve exploration; softmax temperature, 2.0, 2.2 and 1.5 to yield the best results')
-	parser.add_argument('-s', '--steps', metavar = 'S', type = int, default = 100, help = '100 training steps(epochs)')
+	parser.add_argument('-s', '--steps', metavar = 'S', type = int, default = 2000, help = '100 training steps(epochs)')
 	parser.add_argument('-o', '--optim', metavar = 'O', type = str, default = 'Adam', help = 'torch optimizer')
 	parser.add_argument('--lr', metavar = 'LR', type = float, default = 1e-3, help = 'initial learning rate')
+	parser.add_argument('--is_lr_decay', action = 'store_false', help = 'flag learning rate scheduler default true')
 	parser.add_argument('--lr_decay', metavar = 'LRD', type = float, default = 0.96, help = 'learning rate scheduler, decay by a factor of 0.96 ')
 	parser.add_argument('--lr_decay_step', metavar = 'LRDS', type = int, default = 5e3, help = 'learning rate scheduler, decay every 5000 steps')
 	parser.add_argument('-al', '--alpha', metavar = 'ALP', type = float, default = 0.99, help = 'alpha decay in active search')
@@ -39,15 +40,22 @@ class Config():
 		for k, v in kwargs.items():
 			self.__dict__[k] = v
 		self.task = 'TSP%d'%self.city_t
+		self.dump_date = datetime.now().strftime('%m%d_%H_%M')
 		self.pkl_path = self.pkl_dir + '%s.pkl'%self.mode
 		for x in [self.log_dir, self.model_dir, self.pkl_dir]:
 			os.makedirs(x, exist_ok = True)
 		
-def dump_pkl(args):
+def dump_pkl(args, verbose = True, param_log = True):
 	cfg = Config(**vars(args))
 	with open(cfg.pkl_path, 'wb') as f:
 		pickle.dump(cfg, f)
 		print('--- save pickle file in %s ---\n'%cfg.pkl_path)
+		if verbose:
+			print(''.join('%s: %s\n'%item for item in vars(cfg).items()))
+		if param_log:
+			path = '%sparam_%s_%s.csv'%(cfg.log_dir, cfg.task, cfg.dump_date)#cfg.log_dir = ./Csv/
+			with open(path, 'w') as f:
+				f.write(''.join('%s,%s\n'%item for item in vars(cfg).items()))
 	
 def load_pkl(pkl_path, verbose = True):
 	if not os.path.isfile(pkl_path):

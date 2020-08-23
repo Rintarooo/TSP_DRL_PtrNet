@@ -17,24 +17,26 @@ class Env_tsp():
 	def __init__(self, cfg):
 		'''
 		nodes(cities) : contains nodes and their 2 dimensional coordinates 
-		[city_t, xy] = [3,2] dimension array e.g. [[0.5,0.7],[0.2,0.3],[0.4,0.1]]
+		[city_t, 2] = [3,2] dimension array e.g. [[0.5,0.7],[0.2,0.3],[0.4,0.1]]
 		'''
 		self.batch = cfg.batch
 		self.city_t = cfg.city_t
-		self.xy = cfg.xy
 			
 	def get_nodes(self, seed = None):
 		'''
-		return nodes:(city_t,xy)
+		return nodes:(city_t,2)
 		'''
 		if seed is not None:
 			torch.manual_seed(seed)
-		return torch.FloatTensor(self.city_t, self.xy).uniform_(0, 1)
+		if torch.cuda.is_available():
+			return torch.cuda.FloatTensor(self.city_t, 2).uniform_(0, 1)
+		else:
+			return torch.FloatTensor(self.city_t, 2).uniform_(0, 1)
 		
 	def stack_nodes(self):
 		'''
-		nodes:(city_t,xy)
-		return inputs:(batch,city_t,xy)
+		nodes:(city_t,2)
+		return inputs:(batch,city_t,2)
 		'''
 		list = [self.get_nodes() for i in range(self.batch)]
 		inputs = torch.stack(list, dim = 0)
@@ -51,7 +53,7 @@ class Env_tsp():
 		
 	def stack_l(self, inputs, tours):
 		'''
-		inputs:(batch,city_t,xy)
+		inputs:(batch,city_t,2)
 		tours:(batch,city_t)
 		return l_batch:(batch)
 		'''
@@ -75,8 +77,8 @@ class Env_tsp():
 	def shuffle(self, inputs):
 		'''
 		shuffle nodes order with a set of xy coordinate
-		inputs:(batch,city_t,xy)
-		return shuffle_inputs:(batch,city_t,xy)
+		inputs:(batch,city_t,2)
+		return shuffle_inputs:(batch,city_t,2)
 		'''
 		shuffle_inputs = torch.zeros(inputs.size())
 		for i in range(self.batch):
@@ -87,8 +89,8 @@ class Env_tsp():
 	def back_tours(self, pred_shuffle_tours, shuffle_inputs, test_inputs, device):
 		'''
 		pred_shuffle_tours:(batch,city_t)
-		shuffle_inputs:(batch,city_t_t,xy)
-		test_inputs:(batch,city_t,xy)
+		shuffle_inputs:(batch,city_t_t,2)
+		test_inputs:(batch,city_t,2)
 		return pred_tours:(batch,city_t)
 		'''
 		pred_tours = []
@@ -107,7 +109,7 @@ class Env_tsp():
 			
 	def get_tour_distance(self, nodes, tour):
 		'''
-		nodes:(city_t,xy), tour:(city_t)
+		nodes:(city_t,2), tour:(city_t)
 		l(= total distance) = l(0-1) + l(1-2) + l(2-3) + ... + l(18-19) + l(19-0) @20%20->0
 		return l:(1)
 		'''
