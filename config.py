@@ -41,7 +41,7 @@ class Config():
 			self.__dict__[k] = v
 		self.task = 'TSP%d'%self.city_t
 		self.dump_date = datetime.now().strftime('%m%d_%H_%M')
-		self.pkl_path = self.pkl_dir + '%s.pkl'%self.mode
+		self.pkl_path = self.pkl_dir + '%s%d.pkl'%(self.mode, self.city_t)
 		for x in [self.log_dir, self.model_dir, self.pkl_dir]:
 			os.makedirs(x, exist_ok = True)
 		
@@ -70,7 +70,7 @@ def load_pkl(pkl_path, verbose = True):
 def pkl_parser():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-p', '--path', metavar = 'P', type = str, 
-						default = './Pkl/test.pkl', help = 'pkl file name')
+						default = './Pkl/test20.pkl', help = 'pkl file name')
 	args = parser.parse_args()
 	return args
 	

@@ -27,16 +27,16 @@ In this paper, two approaches to find the best tour at inference time are propos
 
 First generate the pickle file contaning hyperparameter values by running the following command.
 ```
-python config.py -m '***'
+python config.py -m '***' -b 512 -ct 20
 ```
 '***' should be 'train', 'train_emv' or 'test'. Next, go on training
 ```
-python train.py -p './Pkl/train.pkl' 
+python train.py -p './Pkl/train20.pkl' 
 ```
 ```
-python train.py -p './Pkl/train_emv.pkl' 
+python train.py -p './Pkl/train_emv20.pkl' 
 ```
 You may use my pre-trained weight
 ```
-python infer.py -p './Pkl/test.pkl' -ap './Pt/***.pt'
+python infer.py -p './Pkl/test20.pkl' -ap './Pt/***.pt'
 ```

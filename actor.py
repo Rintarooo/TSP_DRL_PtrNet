@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from config import Config, load_pkl, pkl_parser
-from layers import Attention
 
 # https://github.com/higgsfield/np-hard-deep-reinforcement-learning/blob/master/Neural%20Combinatorial%20Optimization.ipynb
 class PtrNet1(nn.Module):
