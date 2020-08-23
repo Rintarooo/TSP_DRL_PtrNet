@@ -38,6 +38,5 @@ python train.py -p './Pkl/train_emv.pkl'
 ```
 You may use my pre-trained weight
 ```
-python infer.py -p './Pkl/test.pkl'
+python infer.py -p './Pkl/test.pkl' -ap './Pt/***.pt'
 ```
-Take the pickle file in main.py
