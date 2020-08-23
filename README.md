@@ -29,8 +29,14 @@ First generate the pickle file contaning hyperparameter values by running the fo
 ```
 python config.py -m '***'
 ```
-*** should be train, train_emv or test
-You may use my pre-trained weight 
+'***' should be 'train', 'train_emv' or 'test'. Next, go on training
+```
+python train.py -p './Pkl/train.pkl' 
+```
+```
+python train.py -p './Pkl/train_emv.pkl' 
+```
+You may use my pre-trained weight
 ```
 python infer.py -p './Pkl/test.pkl'
 ```
