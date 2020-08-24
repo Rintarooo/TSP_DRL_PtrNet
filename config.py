@@ -14,7 +14,7 @@ def argparser():
 	parser.add_argument('-hi', '--hidden', metavar = 'HI', type = int, default = 128, help = 'hidden size')
 	parser.add_argument('-c', '--clip_logits', metavar = 'C', type = int, default = 10, help = 'improve exploration; clipping logits')
 	parser.add_argument('-st', '--softmax_T', metavar = 'T', type = float, default = 1.0, help = 'improve exploration; softmax temperature, 2.0, 2.2 and 1.5 to yield the best results')
-	parser.add_argument('-s', '--steps', metavar = 'S', type = int, default = 2000, help = '100 training steps(epochs)')
+	parser.add_argument('-s', '--steps', metavar = 'S', type = int, default = 2000, help = 'training steps(epochs)')
 	parser.add_argument('-o', '--optim', metavar = 'O', type = str, default = 'Adam', help = 'torch optimizer')
 	parser.add_argument('--lr', metavar = 'LR', type = float, default = 1e-3, help = 'initial learning rate')
 	parser.add_argument('--is_lr_decay', action = 'store_false', help = 'flag learning rate scheduler default true')
@@ -23,7 +23,8 @@ def argparser():
 	parser.add_argument('-al', '--alpha', metavar = 'ALP', type = float, default = 0.99, help = 'alpha decay in active search')
 	parser.add_argument('-minv', '--init_min', metavar = 'MINV', type = float, default = -0.08, help = 'initialize weight minimun value -0.08~')
 	parser.add_argument('-maxv', '--init_max', metavar = 'MAXV', type = float, default = 0.08, help = 'initialize weight ~0.08 maximum value')
-	
+	parser.add_argument('-nw', '--num_workers', metavar = 'NUMW', type = int, default = 6, help = 'args num_workers in Dataloader, pytorch')
+
 	parser.add_argument('--islogger', action = 'store_false', help = 'flag csv logger default true')
 	parser.add_argument('--issaver', action = 'store_false', help = 'flag model saver default true')
 	parser.add_argument('-ls', '--log_step', metavar = 'LOGS', type = int, default = 10, help = 'logger timing')
