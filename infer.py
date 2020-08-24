@@ -1,6 +1,5 @@
 import torch
 from time import time
-import sys
 from env import Env_tsp
 from config import Config, load_pkl, pkl_parser
 from search import sampling, active_search
@@ -55,5 +54,5 @@ if __name__ == '__main__':
 		search_tour(cfg, env)
 
 	else:
-		sys.exit('test only, specify test pkl file')
-
+		raise NotImplementedError('test only, specify test pkl file')
+		

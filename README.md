@@ -27,7 +27,7 @@ In this paper, two approaches to find the best tour at inference time are propos
 
 First generate the pickle file contaning hyperparameter values by running the following command.
 ```
-python config.py -m '***' -b 512 -ct 20
+python config.py -m '***' -b 512 -ct 20 -s 10000
 ```
 '***' should be 'train', 'train_emv' or 'test'. Next, go on training
 ```

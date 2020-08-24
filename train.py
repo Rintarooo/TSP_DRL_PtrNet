@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import sys
 from tqdm import tqdm
 from datetime import datetime
 
@@ -136,5 +135,5 @@ if __name__ == '__main__':
 	if cfg.mode == 'train_emv':
 		train_model_emv(cfg, env)
 	else:
-		sys.exit('train only, specify train pkl file')
+		raise NotImplementedError('train and train_emv only, specify train pkl file')
 				
