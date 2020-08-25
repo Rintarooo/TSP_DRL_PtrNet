@@ -30,7 +30,7 @@ def argparser():
 	parser.add_argument('-ld', '--log_dir', metavar = 'LD', type = str, default = './Csv/', help = 'csv logger dir')
 	parser.add_argument('-md', '--model_dir', metavar = 'MD', type = str, default = './Pt/', help = 'model save dir')
 	parser.add_argument('-pd', '--pkl_dir', metavar = 'PD', type = str, default = './Pkl/', help = 'pkl save dir')
-	parser.add_argument('-ap', '--act_model_path', metavar = 'AMP', type = str, default = './Pt/0510_act.pt', help = 'load actor model path')
+	parser.add_argument('-ap', '--act_model_path', metavar = 'AMP', type = str, help = 'load actor model path')
 	parser.add_argument('-cd', '--cuda_dv', metavar = 'CD', type = str, default = '0', help = 'os CUDA_VISIBLE_DEVICE')
 	args = parser.parse_args()
 	return args

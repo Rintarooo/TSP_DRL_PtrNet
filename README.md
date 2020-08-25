@@ -6,10 +6,13 @@ Pointer Networks(PN) is introduced by Vinyals et al. 2015(https://arxiv.org/abs/
 
 ![Screen Shot 2020-05-12 at 12 15 35 AM](https://user-images.githubusercontent.com/51239551/81578424-bf082f80-93e5-11ea-812a-914c9046587a.png)
 
+
 ## Actor-Critic Algorithm to train PN on TSP without supervised solution
 In this work, we tackle Traveling Salesman Problem(TSP), which is one of the combinatorial optimization problems known as NP-hard. TSP seeks for the shortest tour for a salesman to visit each city exactly once.
 
-In the training phase, this TSP solver optimizes 2 different types of Pointer Networks which are Actor and Critic model. Given a graph of cities where the cities are the nodes, critic model predicts expected tour length, which is generally called state-value. Parameters of critic model are optimized as estimated tour length catch up with the actual length calculated from the tour(city permutation) predicted by actor model. Actor model updates its policy parameters with the value called advantage which subtracts state-value from the actual tour length.
+In the training phase, this TSP solver optimizes 2 different types of Pointer Networks which are Actor and Critic model. 
+
+Given a graph of cities where the cities are the nodes, critic model predicts expected tour length, which is generally called state-value. Parameters of critic model are optimized as estimated tour length catch up with the actual length calculated from the tour(city permutation) predicted by actor model. Actor model updates its policy parameters with the value called advantage which subtracts state-value from the actual tour length.
 
 ``` 
 Actor:  Defines the agent's behavior, its policy
@@ -49,3 +52,16 @@ python config.py -m 'test' -ct 20 -s 10 --islogger -ap './Pt/0825_15_49_step4990
 ```bash
 python infer.py -p './Pkl/test20.pkl' 
 ```
+
+## Environment
+I leave my own environment below. I tested it out on single GPU, Linux(Ubuntu 18.04.5 LTS) 
+	* GPU:
+		* NVIDIA GeForce RTX 2080 Ti VENTUS 11GB
+	* CPU:
+		* Intel® Xeon® processor 5600/5500 
+### Dependencies
+* Python = 3.6.10
+* PyTorch = 1.2.0
+* tqdm
+* numpy
+* matplotlib (only for plotting)
