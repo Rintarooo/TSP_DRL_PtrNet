@@ -37,7 +37,7 @@ def train_model(cfg, env, log_path = None):
 	act_model, cri_model = act_model.to(device), cri_model.to(device)
 	
 	ave_act_loss, ave_cri_loss, ave_L = 0., 0., 0.
-	for i, inputs in enumerate(dataloader):
+	for i, inputs in tqdm(enumerate(dataloader)):
 		inputs = inputs.to(device)
 		pred_tour, ll = act_model(inputs, device)
 		real_l = env.stack_l(inputs, pred_tour)
@@ -93,7 +93,7 @@ def train_model_emv(cfg, env, log_path = None):
 	act_model = act_model.to(device)
 
 	ave_act_loss, ave_L = 0., 0.
-	for i, inputs in enumerate(dataloader):
+	for i, inputs in tqdm(enumerate(dataloader)):
 		inputs = inputs.to(device)
 		pred_tour, ll = act_model(inputs, device)
 		real_l = env.stack_l(inputs, pred_tour)
