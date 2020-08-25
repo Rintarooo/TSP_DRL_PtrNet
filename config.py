@@ -46,12 +46,12 @@ class Config():
 		for x in [self.log_dir, self.model_dir, self.pkl_dir]:
 			os.makedirs(x, exist_ok = True)
 		
-def dump_pkl(args, verbose = True, param_log = True):
+def dump_pkl(args, verbose = True, param_log = True, override = None):
 	cfg = Config(**vars(args))
+	if os.path.exists(cfg.pkl_path):
+		override = input(f'found the same name {cfg.pkl_path}. want to override previous pkl file? [y/n]:')
 	with open(cfg.pkl_path, 'wb') as f:
-		if os.path.exists(cfg.pkl_path):
-			override = input('found the same name file. want to override pkl file? [y/n]:')
-			if override == 'n':
+		if override == 'n':
 				raise RuntimeError('change cfg.pkl_path')			
 		pickle.dump(cfg, f)
 		print('--- save pickle file in %s ---\n'%cfg.pkl_path)
