@@ -30,12 +30,12 @@ In this paper, two approaches to find the best tour at inference time are propos
 
 ### Training
 
-First generate the pickle file contaning hyperparameter values by running the following command.
+First generate the pickle file contaning hyperparameter values by running the following command(in this example, batch size is 512, 20 city nodes, 10000 steps).
 
 ```bash
 python config.py -m 'train' -b 512 -ct 20 -s 10000
 ```
--m 'train' could be replaced with -m 'train_emv'. emv is the abbreviation of Exponential Moving Average which doesn't need critic model. Then, go on training.
+-m 'train' could be replaced with -m 'train_emv'. emv is the abbreviation of 'Exponential Moving Average', which doesn't need critic model. Then, go on training.
 ```bash
 python train.py -p './Pkl/train20.pkl' 
 ```
