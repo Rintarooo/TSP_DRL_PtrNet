@@ -6,7 +6,7 @@ from datetime import datetime
 
 def argparser():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-m', '--mode', metavar = 'M', type = str, choices = ['train', 'train_emv', 'test'], help = 'train or train_emv or test')
+	parser.add_argument('-m', '--mode', metavar = 'M', type = str, required = True, choices = ['train', 'train_emv', 'test'], help = 'train or train_emv or test')
 	parser.add_argument('--seed', metavar = 'SEED', type = int, default = 1, help = 'random seed number for inference, reproducibility')
 	parser.add_argument('-b', '--batch', metavar = 'B', type = int, default = 512, help = 'batch size')
 	parser.add_argument('-ct', '--city_t', metavar = 'CT', type = int, default = 20, help = 'number of cities, time sequence')
@@ -23,7 +23,6 @@ def argparser():
 	parser.add_argument('-al', '--alpha', metavar = 'ALP', type = float, default = 0.99, help = 'alpha decay in active search')
 	parser.add_argument('-minv', '--init_min', metavar = 'MINV', type = float, default = -0.08, help = 'initialize weight minimun value -0.08~')
 	parser.add_argument('-maxv', '--init_max', metavar = 'MAXV', type = float, default = 0.08, help = 'initialize weight ~0.08 maximum value')
-	parser.add_argument('-nw', '--num_workers', metavar = 'NUMW', type = int, default = 6, help = 'args num_workers in Dataloader, pytorch')
 
 	parser.add_argument('--islogger', action = 'store_false', help = 'flag csv logger default true')
 	parser.add_argument('--issaver', action = 'store_false', help = 'flag model saver default true')
@@ -43,12 +42,17 @@ class Config():
 		self.task = 'TSP%d'%self.city_t
 		self.dump_date = datetime.now().strftime('%m%d_%H_%M')
 		self.pkl_path = self.pkl_dir + '%s%d.pkl'%(self.mode, self.city_t)
+		self.n_samples = self.batch * self.steps
 		for x in [self.log_dir, self.model_dir, self.pkl_dir]:
 			os.makedirs(x, exist_ok = True)
 		
 def dump_pkl(args, verbose = True, param_log = True):
 	cfg = Config(**vars(args))
 	with open(cfg.pkl_path, 'wb') as f:
+		if os.path.exists(cfg.pkl_path):
+			override = input('found same file name. want to override pkl file? [Y/N]')
+			if override == 'N':
+				raise RuntimeError('change cfg.pkl_path')			
 		pickle.dump(cfg, f)
 		print('--- save pickle file in %s ---\n'%cfg.pkl_path)
 		if verbose:

@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader
 from tqdm import tqdm
 from datetime import datetime
 
@@ -9,7 +8,6 @@ from actor import PtrNet1
 from critic import PtrNet2
 from env import Env_tsp
 from config import Config, load_pkl, pkl_parser
-from data import Generator
 
 # torch.autograd.set_detect_anomaly(True)
 torch.backends.cudnn.benchmark = True
@@ -30,14 +28,13 @@ def train_model(cfg, env, log_path = None):
 		cri_lr_scheduler = optim.lr_scheduler.StepLR(cri_optim, 
 					step_size = cfg.lr_decay_step, gamma = cfg.lr_decay)
 	mse_loss = nn.MSELoss()
-	dataset = Generator(cfg, env)
-	dataloader = DataLoader(dataset, batch_size = cfg.batch, shuffle = True)
-
+	
 	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 	act_model, cri_model = act_model.to(device), cri_model.to(device)
 	
 	ave_act_loss, ave_cri_loss, ave_L = 0., 0., 0.
-	for i, inputs in enumerate(dataloader):
+	for i in tqdm(range(cfg.steps)):
+		inputs = env.stack_nodes()
 		inputs = inputs.to(device)
 		pred_tour, ll = act_model(inputs, device)
 		real_l = env.stack_l(inputs, pred_tour)
@@ -86,14 +83,12 @@ def train_model_emv(cfg, env, log_path = None):
 		act_lr_scheduler = optim.lr_scheduler.StepLR(act_optim, 
 						step_size=cfg.lr_decay_step, gamma=cfg.lr_decay)
 
-	dataset = Generator(cfg, env)
-	dataloader = DataLoader(dataset, batch_size = cfg.batch, shuffle = True)
-
 	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 	act_model = act_model.to(device)
 
 	ave_act_loss, ave_L = 0., 0.
-	for i, inputs in enumerate(dataloader):
+	for i in tqdm(range(cfg.steps)):
+		inputs = env.stack_nodes()
 		inputs = inputs.to(device)
 		pred_tour, ll = act_model(inputs, device)
 		real_l = env.stack_l(inputs, pred_tour)
