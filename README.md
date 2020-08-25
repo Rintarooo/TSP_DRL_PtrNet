@@ -10,7 +10,7 @@ Pointer Networks(PN) is introduced by Vinyals et al. 2015(https://arxiv.org/abs/
 ## Actor-Critic Algorithm to train PN on TSP without supervised solution
 In this work, we tackle Traveling Salesman Problem(TSP), which is one of the combinatorial optimization problems known as NP-hard. TSP seeks for the shortest tour for a salesman to visit each city exactly once.
 
-In the training phase, this TSP solver optimizes 2 different types of Pointer Networks which are Actor and Critic model. 
+In the training phase, this TSP solver optimizes 2 different types of Pointer Networks, Actor and Critic model. 
 
 Given a graph of cities where the cities are the nodes, critic model predicts expected tour length, which is generally called state-value. Parameters of critic model are optimized as estimated tour length catch up with the actual length calculated from the tour(city permutation) predicted by actor model. Actor model updates its policy parameters with the value called advantage which subtracts state-value from the actual tour length.
 
