@@ -54,13 +54,14 @@ python infer.py -p './Pkl/test20.pkl'
 ```
 
 ## Environment
-I leave my own environment below. I tested it out on single GPU
+I leave my own environment below. I tested it out on single GPU.
 * OS:
 	* Linux(Ubuntu 18.04.5 LTS) 
 * GPU:
 	* NVIDIA GeForce RTX 2080 Ti VENTUS 11GB
 * CPU:
-	* Intel® Xeon® processor 5600/5500 
+	* Intel® Xeon® CPU E5640 @ 2.67GHz
+
 ### Dependencies
 * Python = 3.6.10
 * PyTorch = 1.2.0
