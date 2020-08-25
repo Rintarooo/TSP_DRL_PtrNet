@@ -68,3 +68,7 @@ I leave my own environment below. I tested it out on single GPU.
 * tqdm
 * numpy
 * matplotlib (only for plotting)
+
+## Reference
+* https://github.com/higgsfield/np-hard-deep-reinforcement-learning
+* https://github.com/zhengsr3/Reinforcement_Learning_Pointer_Networks_TSP_Pytorch
