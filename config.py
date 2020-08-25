@@ -39,7 +39,7 @@ class Config():
 	def __init__(self, **kwargs):	
 		for k, v in kwargs.items():
 			self.__dict__[k] = v
-		self.task = 'TSP%d'%self.city_t
+		self.task = 'TSP%d_%s'%(self.city_t, self.mode)
 		self.dump_date = datetime.now().strftime('%m%d_%H_%M')
 		self.pkl_path = self.pkl_dir + '%s%d.pkl'%(self.mode, self.city_t)
 		self.n_samples = self.batch * self.steps
@@ -58,7 +58,7 @@ def dump_pkl(args, verbose = True, param_log = True):
 		if verbose:
 			print(''.join('%s: %s\n'%item for item in vars(cfg).items()))
 		if param_log:
-			path = '%sparam_%s_%s.csv'%(cfg.log_dir, cfg.task, cfg.dump_date)#cfg.log_dir = ./Csv/
+			path = '%s%s_param_%s.csv'%(cfg.log_dir, cfg.task, cfg.dump_date)#cfg.log_dir = ./Csv/
 			with open(path, 'w') as f:
 				f.write(''.join('%s,%s\n'%item for item in vars(cfg).items()))
 	

@@ -23,7 +23,7 @@ model_dir,./Pt/
 pkl_dir,./Pkl/
 act_model_path,./Pt/0825_15_49_step4990_act.pt
 cuda_dv,0
-task,TSP20
-dump_date,0825_17_38
+task,TSP20_test
+dump_date,0825_17_48
 pkl_path,./Pkl/test20.pkl
 n_samples,5120
