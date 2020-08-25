@@ -42,6 +42,7 @@ def train_model(cfg, env, log_path = None):
 	dataloader = DataLoader(dataset, batch_size = cfg.batch, shuffle = True)
 
 	ave_act_loss, ave_L = 0., 0.
+	min_L, cnt = 1e7, 0
 	t1 = time()
 	# for i, inputs in tqdm(enumerate(dataloader)):
 	for i, inputs in enumerate(dataloader):
@@ -55,7 +56,8 @@ def train_model(cfg, env, log_path = None):
 			cri_loss.backward()
 			nn.utils.clip_grad_norm_(cri_model.parameters(), max_norm = 1., norm_type = 2)
 			cri_optim.step()
-			cri_lr_scheduler.step()
+			if cfg.is_lr_decay:
+				cri_lr_scheduler.step()
 		elif cfg.mode == 'train_emv':
 			if i == 0:
 				L = real_l.detach().mean()
@@ -69,7 +71,8 @@ def train_model(cfg, env, log_path = None):
 		act_loss.backward()
 		nn.utils.clip_grad_norm_(act_model.parameters(), max_norm = 1., norm_type = 2)
 		act_optim.step()
-		act_lr_scheduler.step()
+		if cfg.is_lr_decay:
+			act_lr_scheduler.step()
 
 		ave_act_loss += act_loss.item()
 		if cfg.mode == 'train':
@@ -99,9 +102,18 @@ def train_model(cfg, env, log_path = None):
 					else:
 						with open(log_path, 'a') as f:
 							f.write('%d,%1.4f,%1.4f,%dmin%dsec\n'%(i, ave_act_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
-
-			if cfg.issaver:		
-				torch.save(act_model.state_dict(), cfg.model_dir + '%s_step%d_act.pt'%(date, i))#'cfg.model_dir = ./Pt/'
+			if(ave_L < min_L):
+				min_L = ave_L
+				if cfg.issaver:		
+					torch.save(act_model.state_dict(), cfg.model_dir + '%s_step%d_act.pt'%(date, i))#'cfg.model_dir = ./Pt/'
+			else:
+				cnt += 1
+				if(cnt >= 150):
+					print('early stop, average cost cant decrease anymore')
+					if log_path is not None:
+						with open(log_path, 'a') as f:
+							f.write('\nearly stop')
+					break
 			t1 = time()
 
 if __name__ == '__main__':

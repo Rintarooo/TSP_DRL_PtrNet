@@ -14,7 +14,7 @@ def sampling(cfg, env, test_input):
 		act_model.load_state_dict(torch.load(cfg.act_model_path, map_location = device))
 	act_model = act_model.to(device)
 	pred_tours, _ = act_model(test_inputs, device)
-	l_batch = env.stack_l(test_inputs, pred_tours)
+	l_batch = env.stack_l_fast(test_inputs, pred_tours)
 	index_lmin = torch.argmin(l_batch)
 	best_tour = pred_tours[index_lmin]
 	return best_tour
@@ -27,7 +27,7 @@ def active_search(cfg, env, test_input, log_path = None):
 	date = datetime.now().strftime('%m%d_%H_%M')
 	test_inputs = test_input.repeat(cfg.batch,1,1)
 	random_tours = env.stack_random_tours()
-	baseline = env.stack_l(test_inputs, random_tours)
+	baseline = env.stack_l_fast(test_inputs, random_tours)
 	l_min = baseline[0]
 	
 	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -52,7 +52,7 @@ def active_search(cfg, env, test_input, log_path = None):
 		pred_shuffle_tours, neg_log = act_model(shuffle_inputs, device)
 		pred_tours = env.back_tours(pred_shuffle_tours, shuffle_inputs, test_inputs, device)
 		
-		l_batch = env.stack_l(test_inputs, pred_tours)
+		l_batch = env.stack_l_fast(test_inputs, pred_tours)
 		
 		index_lmin = torch.argmin(l_batch)
 		if torch.min(l_batch) != l_batch[index_lmin]:
@@ -70,7 +70,7 @@ def active_search(cfg, env, test_input, log_path = None):
 		mean(adv(batch) * neg_log(batch)) -> act_loss(scalar) 
 		'''
 		act_loss.backward()
-		nn.utils.clip_grad_norm_(act_model.parameters(), max_norm = 1, norm_type = 2)
+		nn.utils.clip_grad_norm_(act_model.parameters(), max_norm = 1., norm_type = 2)
 		act_optim.step()
 		baseline = baseline*cfg.alpha + (1-cfg.alpha)*torch.mean(l_batch, dim = 0)
 		if i % 10 == 0:
