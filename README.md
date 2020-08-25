@@ -42,9 +42,9 @@ python train.py -p './Pkl/train_emv20.pkl'
 ```
 
 ### Inference
-After completing training, set the configuration. Now you can see how the training process went from the csv files in the 'Csv' dir. you may use my pre-trained weight './Pt/0825_15_49_step4990_act.pt' in the 'Pt' dir.
+After completing training, set the configuration for inference. Now you can see how the training process went from the csv files in the 'Csv' dir. You may use my pre-trained weight './Pt/0825_15_49_step4990_act.pt' in the 'Pt' dir.
 ```bash
-python config.py -m 'test' -ct 20 -ap './Pt/0825_15_49_step4990_act.pt'
+python config.py -m 'test' -ct 20 -s 10 --islogger -ap './Pt/0825_15_49_step4990_act.pt'
 ```
 ```bash
 python infer.py -p './Pkl/test20.pkl' 

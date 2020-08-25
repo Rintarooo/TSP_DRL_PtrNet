@@ -73,8 +73,7 @@ def active_search(cfg, env, test_input, log_path = None):
 		nn.utils.clip_grad_norm_(act_model.parameters(), max_norm = 1., norm_type = 2)
 		act_optim.step()
 		baseline = baseline*cfg.alpha + (1-cfg.alpha)*torch.mean(l_batch, dim = 0)
-		if i % 10 == 0:
-			print('step:%d/%d, actic loss:%1.3f'%(i, cfg.steps, act_loss.data))
+		print('step:%d/%d, actic loss:%1.3f'%(i, cfg.steps, act_loss.data))
 		
 		if cfg.islogger:
 			if i % cfg.log_step == 0:

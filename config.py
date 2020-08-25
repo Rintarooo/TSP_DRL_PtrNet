@@ -50,8 +50,8 @@ def dump_pkl(args, verbose = True, param_log = True):
 	cfg = Config(**vars(args))
 	with open(cfg.pkl_path, 'wb') as f:
 		if os.path.exists(cfg.pkl_path):
-			override = input('found same file name. want to override pkl file? [Y/N]')
-			if override == 'N':
+			override = input('found the same name file. want to override pkl file? [y/n]:')
+			if override == 'n':
 				raise RuntimeError('change cfg.pkl_path')			
 		pickle.dump(cfg, f)
 		print('--- save pickle file in %s ---\n'%cfg.pkl_path)
