@@ -63,6 +63,7 @@ class Env_tsp():
 
 	def stack_l_fast(self, inputs, tours):
 		""" 
+		*** this function is faster version of stack_l! ***
 		inputs: (batch, city_t, 2), Coordinates of nodes
 		tours: (batch, city_t), predicted tour
 		d: (batch, city_t, 2)

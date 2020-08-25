@@ -17,11 +17,11 @@ def search_tour(cfg, env):
 	t2 = time()
 	print('sampling: %dmin %1.2fsec\n'%((t2-t1)//60, (t2-t1)%60))
 	
-	t1 = time()
-	pred_tour = active_search(cfg, env, test_input)
-	env.show(test_input, pred_tour)
-	t2 = time()
-	print('active search: %dmin %1.2fsec\n'%((t2-t1)//60, (t2-t1)%60))
+	# t1 = time()
+	# pred_tour = active_search(cfg, env, test_input)
+	# env.show(test_input, pred_tour)
+	# t2 = time()
+	# print('active search: %dmin %1.2fsec\n'%((t2-t1)//60, (t2-t1)%60))
 	
 	# t1 = time()
 	# optimal_tour = env.get_optimal_tour(test_input)

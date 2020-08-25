@@ -8,8 +8,6 @@ from config import Config, load_pkl, pkl_parser
 
 class Generator(Dataset):
 	def __init__(self, cfg, env):
-		# if torch.cuda.is_available():
-		# 	torch.cuda.synchronize()
 		self.data_list = [env.get_nodes() for i in tqdm(range(cfg.n_samples), disable = False, desc = 'Generate input data')]
 
 	def __getitem__(self, idx):
