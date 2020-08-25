@@ -73,6 +73,7 @@ class Env_tsp():
 				+ (d[:, 0] - d[:, -1]).norm(p = 2, dim = 1))# distance from last node to first selected node)
 	
 	def show(self, nodes, tour):
+		nodes = nodes.cpu().detach()
 		print('distance:{:.3f}'.format(self.get_tour_distance(nodes, tour)))	
 		print(tour)
 		plt.figure()
