@@ -40,7 +40,7 @@ def train_model(cfg, env, log_path = None):
 	for i, inputs in tqdm(enumerate(dataloader)):
 		inputs = inputs.to(device)
 		pred_tour, ll = act_model(inputs, device)
-		real_l = env.stack_l(inputs, pred_tour)
+		real_l = env.stack_l_fast(inputs, pred_tour)
 		pred_l = cri_model(inputs, device)
 		cri_loss = mse_loss(pred_l, real_l.detach())
 		cri_optim.zero_grad()
@@ -96,7 +96,7 @@ def train_model_emv(cfg, env, log_path = None):
 	for i, inputs in tqdm(enumerate(dataloader)):
 		inputs = inputs.to(device)
 		pred_tour, ll = act_model(inputs, device)
-		real_l = env.stack_l(inputs, pred_tour)
+		real_l = env.stack_l_fast(inputs, pred_tour)
 		
 		if i == 0:
 			L = real_l.detach().mean()

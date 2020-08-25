@@ -59,8 +59,18 @@ class Env_tsp():
 		'''
 		list = [self.get_tour_distance(inputs[i], tours[i]) for i in range(self.batch)]
 		l_batch = torch.stack(list, dim = 0)
-		return l_batch	
-		
+		return l_batch
+
+	def stack_l_fast(self, inputs, tours):
+		""" 
+		inputs: (batch, city_t, 2), Coordinates of nodes
+		tours: (batch, city_t), predicted tour
+		d: (batch, city_t, 2)
+		"""
+		d = torch.gather(input = inputs, dim = 1, index = tours[:,:,None].repeat(1,1,2))
+		return (torch.sum((d[:, 1:] - d[:, :-1]).norm(p = 2, dim = 2), dim = 1)
+				+ (d[:, 0] - d[:, -1]).norm(p = 2, dim = 1))# distance from last node to first selected node)
+	
 	def show(self, nodes, tour):
 		print('distance:{:.3f}'.format(self.get_tour_distance(nodes, tour)))	
 		print(tour)

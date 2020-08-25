@@ -1,7 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 from config import Config, load_pkl, pkl_parser
+from env import Env_tsp
 
 # https://github.com/higgsfield/np-hard-deep-reinforcement-learning/blob/master/Neural%20Combinatorial%20Optimization.ipynb
 class PtrNet1(nn.Module):
@@ -131,4 +133,11 @@ if __name__ == '__main__':
 
 	# ll.mean().backward()
 	# print(model.W_q.weight.grad)
+
+	cfg.batch = 3
+	env = Env_tsp(cfg)
+	cost = env.stack_l(inputs, pi)
+	print('cost:', cost.size(), cost)
+	cost = env.stack_l_fast(inputs, pi)
+	print('cost:', cost.size(), cost)
 	
