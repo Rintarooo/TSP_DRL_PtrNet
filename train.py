@@ -79,7 +79,7 @@ def train_model(cfg, env, log_path = None):
 		if i % cfg.log_step == 0:
 			t2 = time()
 			if cfg.mode == 'train':	
-				print('step:%d/%d, actic loss:%1.3f, critic loss:%1.3f, L:%1.3f\n, %dmin%dsec'%(i, cfg.steps, ave_act_loss/(i+1), ave_cri_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
+				print('step:%d/%d, actic loss:%1.3f, critic loss:%1.3f, L:%1.3f, %dmin%dsec\n'%(i, cfg.steps, ave_act_loss/(i+1), ave_cri_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
 				if cfg.islogger:
 					if log_path is None:
 						log_path = cfg.log_dir + 'train_%s.csv'%(date)#cfg.log_dir = ./Csv/
@@ -90,7 +90,7 @@ def train_model(cfg, env, log_path = None):
 							f.write('%d,%1.4f,%1.4f,%1.4f,%dmin%dsec\n'%(i, ave_act_loss/(i+1), ave_cri_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
 			
 			elif cfg.mode == 'train_emv':
-				print('step:%d/%d, actic loss:%1.3f, L:%1.3f\n, %dmin%dsec'%(i, cfg.steps, ave_act_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
+				print('step:%d/%d, actic loss:%1.3f, L:%1.3f, %dmin%dsec\n'%(i, cfg.steps, ave_act_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
 				if cfg.islogger:
 					if log_path is None:
 						log_path = cfg.log_dir + 'train_%s.csv'%(date)#cfg.log_dir = ./Csv/
