@@ -58,7 +58,7 @@ I leave my own environment below. I tested it out on single GPU.
 * OS:
 	* Linux(Ubuntu 18.04.5 LTS) 
 * GPU:
-	* NVIDIA GeForce RTX 2080 Ti VENTUS 11GB
+	* NVIDIA® GeForce® RTX 2080 Ti VENTUS 11GB OC
 * CPU:
 	* Intel® Xeon® CPU E5640 @ 2.67GHz
 
