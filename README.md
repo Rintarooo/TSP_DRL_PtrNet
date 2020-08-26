@@ -21,7 +21,9 @@ Critic: Estimates the state-value
 
 
 ## Active Search and Sampling
-In this paper, two approaches to find the best tour at inference time are proposed, which we refer to as Sampling and Active Search. Search strategy called Active Search takes actor model and use policy gradient for updating its parameters to find the shortest tour. Sampling simply just select the shortest tour out of 1 batch.
+In this paper, two approaches to find the best tour at inference time are proposed, which we refer to as Sampling and Active Search. 
+
+Search strategy called Active Search takes actor model and use policy gradient for updating its parameters to find the shortest tour. Sampling simply just select the shortest tour out of 1 batch.
 
 ![Figure_13png](https://user-images.githubusercontent.com/51239551/82798619-bae31400-9eb3-11ea-9cf4-59f1c0a49a88.png)
 
@@ -30,7 +32,8 @@ In this paper, two approaches to find the best tour at inference time are propos
 
 ### Training
 
-First generate the pickle file contaning hyperparameter values by running the following command(in this example, batch size is 512, 20 city nodes, 10000 steps).
+First generate the pickle file contaning hyperparameter values by running the following command
+(in this example, batch size is 512, 20 city nodes, 10000 steps).
 
 ```bash
 python config.py -m 'train' -b 512 -ct 20 -s 10000
@@ -45,7 +48,7 @@ python train.py -p './Pkl/train_emv20.pkl'
 ```
 
 ### Inference
-After completing training, set the configuration for inference. Now you can see how the training process went from the csv files in the 'Csv' dir. You may use my pre-trained weight './Pt/0825_15_49_step4990_act.pt' in the 'Pt' dir.
+After completing training, set the configuration for inference. Now, you can see how the training process went from the csv files in the 'Csv' dir. You may use my pre-trained weight './Pt/0825_15_49_step4990_act.pt' in the 'Pt' dir.
 ```bash
 python config.py -m 'test' -ct 20 -s 10 --islogger -ap './Pt/0825_15_49_step4990_act.pt'
 ```
@@ -54,7 +57,7 @@ python infer.py -p './Pkl/test20.pkl'
 ```
 
 ## Environment
-I leave my own environment below. I tested it out on single GPU.
+I leave my own environment below. I tested it out on a single GPU.
 * OS:
 	* Linux(Ubuntu 18.04.5 LTS) 
 * GPU:
