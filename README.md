@@ -73,9 +73,10 @@ I leave my own environment below. I tested it out on a single GPU.
 * matplotlib (only for plotting)
 
 ## Reference
-* https://github.com/higgsfield/np-hard-deep-reinforcement-learning
-* https://github.com/zhengsr3/Reinforcement_Learning_Pointer_Networks_TSP_Pytorch
-* https://github.com/pemami4911/neural-combinatorial-rl-pytorch
-* https://github.com/jingw2/neural-combinatorial-optimization-rl
-* https://github.com/dave-yxw/rl_tsp
-* https://github.com/shirgur/PointerNet
+	** https://github.com/higgsfield/np-hard-deep-reinforcement-learning
+	** https://github.com/zhengsr3/Reinforcement_Learning_Pointer_Networks_TSP_Pytorch
+	** https://github.com/pemami4911/neural-combinatorial-rl-pytorch
+	** https://github.com/MichelDeudon/neural-combinatorial-optimization-rl-tensorflow
+	** https://github.com/jingw2/neural-combinatorial-optimization-rl
+	** https://github.com/dave-yxw/rl_tsp
+	** https://github.com/shirgur/PointerNet
