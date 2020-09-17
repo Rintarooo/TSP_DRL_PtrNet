@@ -49,10 +49,10 @@ class Config():
 def dump_pkl(args, verbose = True, param_log = True, override = None):
 	cfg = Config(**vars(args))
 	if os.path.exists(cfg.pkl_path):
-		override = input(f'found the same name {cfg.pkl_path}. want to override previous pkl file? [y/n]:')
+		override = input(f'found the same name file {cfg.pkl_path}. override previous pkl file? [y/n]:')
 	with open(cfg.pkl_path, 'wb') as f:
 		if override == 'n':
-				raise RuntimeError('change cfg.pkl_path')			
+				raise RuntimeError('modify cfg.pkl_path in config.py as you like')			
 		pickle.dump(cfg, f)
 		print('--- save pickle file in %s ---\n'%cfg.pkl_path)
 		if verbose:
@@ -75,7 +75,7 @@ def load_pkl(pkl_path, verbose = True):
 def pkl_parser():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-p', '--path', metavar = 'P', type = str, 
-						default = './Pkl/test20.pkl', help = 'pkl file name')
+						default = 'Pkl/test20.pkl', help = 'pkl file name')
 	args = parser.parse_args()
 	return args
 	

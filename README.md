@@ -32,28 +32,27 @@ Search strategy called Active Search takes actor model and use policy gradient f
 
 ### Training
 
-First generate the pickle file contaning hyperparameter values by running the following command
+First generate the pickle file contaning hyperparameter values by running the following command  
+
 (in this example, batch size is 512, 20 city nodes, 10000 steps).
 
 ```bash
-python config.py -m 'train' -b 512 -ct 20 -s 10000
+python config.py -m train -b 512 -ct 20 -s 10000
 ```
--m 'train' could be replaced with -m 'train_emv'. emv is the abbreviation of 'Exponential Moving Average', which doesn't need critic model. Then, go on training.
+`-m train` could be replaced with `-m train_emv`. emv is the abbreviation of 'Exponential Moving Average', which doesn't need critic model. Then, go on training.
 ```bash
-python train.py -p './Pkl/train20.pkl' 
-```
-or
-```bash
-python train.py -p './Pkl/train_emv20.pkl' 
-```
+python train.py -p Pkl/train20.pkl
+```  
 
 ### Inference
-After completing training, set the configuration for inference. Now, you can see how the training process went from the csv files in the 'Csv' dir. You may use my pre-trained weight './Pt/0825_15_49_step4990_act.pt' in the 'Pt' dir.
+After completing training, set the configuration for inference.  
+Now, you can see how the training process went from the csv files in the 'Csv' dir.  
+You may use my pre-trained weight `Pt/0825_15_49_step4990_act.pt` in the 'Pt' dir.
 ```bash
-python config.py -m 'test' -ct 20 -s 10 --islogger -ap './Pt/0825_15_49_step4990_act.pt'
+python config.py -m test -ct 20 -s 10 --islogger -ap Pt/0825_15_49_step4990_act.pt
 ```
 ```bash
-python infer.py -p './Pkl/test20.pkl' 
+python infer.py -p Pkl/test20.pkl
 ```
 
 ## Environment
