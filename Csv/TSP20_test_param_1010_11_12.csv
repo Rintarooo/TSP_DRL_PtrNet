@@ -6,7 +6,7 @@ embed,128
 hidden,128
 clip_logits,10
 softmax_T,1.0
-steps,10
+steps,10000
 optim,Adam
 lr,0.001
 is_lr_decay,True
@@ -21,9 +21,9 @@ log_step,10
 log_dir,./Csv/
 model_dir,./Pt/
 pkl_dir,./Pkl/
-act_model_path,./Pt/0825_15_49_step4990_act.pt
+act_model_path,Pt/1010_02_23_step12999_act.pt
 cuda_dv,0
 task,TSP20_test
-dump_date,0825_17_48
+dump_date,1010_11_12
 pkl_path,./Pkl/test20.pkl
-n_samples,5120
+n_samples,5120000

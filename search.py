@@ -12,6 +12,8 @@ def sampling(cfg, env, test_input):
 	act_model = PtrNet1(cfg)
 	if os.path.exists(cfg.act_model_path):	
 		act_model.load_state_dict(torch.load(cfg.act_model_path, map_location = device))
+	else:
+		print('specify pretrained model path')
 	act_model = act_model.to(device)
 	pred_tours, _ = act_model(test_inputs, device)
 	l_batch = env.stack_l_fast(test_inputs, pred_tours)
@@ -25,12 +27,12 @@ def active_search(cfg, env, test_input, log_path = None):
 	test input:(city_t,xy)
 	'''
 	date = datetime.now().strftime('%m%d_%H_%M')
-	test_inputs = test_input.repeat(cfg.batch,1,1)
-	random_tours = env.stack_random_tours()
+	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+	test_inputs = test_input.repeat(cfg.batch,1,1).to(device)
+	random_tours = env.stack_random_tours().to(device)
 	baseline = env.stack_l_fast(test_inputs, random_tours)
 	l_min = baseline[0]
 	
-	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 	act_model = PtrNet1(cfg)
 	if os.path.exists(cfg.act_model_path):	
 		act_model.load_state_dict(torch.load(cfg.act_model_path, map_location = device))
@@ -50,7 +52,7 @@ def active_search(cfg, env, test_input, log_path = None):
 		test_inputs = test_inputs.to(device)
 		shuffle_inputs = env.shuffle(test_inputs)
 		pred_shuffle_tours, neg_log = act_model(shuffle_inputs, device)
-		pred_tours = env.back_tours(pred_shuffle_tours, shuffle_inputs, test_inputs, device)
+		pred_tours = env.back_tours(pred_shuffle_tours, shuffle_inputs, test_inputs, device).to(device)
 		
 		l_batch = env.stack_l_fast(test_inputs, pred_tours)
 		

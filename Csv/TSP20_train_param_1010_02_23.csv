@@ -1,12 +1,12 @@
 mode,train
 seed,1
-batch,128
-city_t,100
+batch,512
+city_t,20
 embed,128
 hidden,128
 clip_logits,10
 softmax_T,1.0
-steps,80000
+steps,13000
 optim,Adam
 lr,0.001
 is_lr_decay,True
@@ -23,7 +23,7 @@ model_dir,./Pt/
 pkl_dir,./Pkl/
 act_model_path,None
 cuda_dv,0
-task,TSP100_train
-dump_date,0825_22_15
-pkl_path,./Pkl/train100.pkl
-n_samples,10240000
+task,TSP20_train
+dump_date,1010_02_23
+pkl_path,./Pkl/train20.pkl
+n_samples,6656000

@@ -15,7 +15,6 @@ from data import Generator
 # torch.autograd.set_detect_anomaly(True)
 torch.backends.cudnn.benchmark = True
 
-# exponential moving average, not use critic model
 def train_model(cfg, env, log_path = None):
 	date = datetime.now().strftime('%m%d_%H_%M')
 	act_model = PtrNet1(cfg)
@@ -82,7 +81,7 @@ def train_model(cfg, env, log_path = None):
 		if i % cfg.log_step == 0:
 			t2 = time()
 			if cfg.mode == 'train':	
-				print('step:%d/%d, actic loss:%1.3f, critic loss:%1.3f, L:%1.3f, %dmin%dsec\n'%(i, cfg.steps, ave_act_loss/(i+1), ave_cri_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
+				print('step:%d/%d, actic loss:%1.3f, critic loss:%1.3f, L:%1.3f, %dmin%dsec'%(i, cfg.steps, ave_act_loss/(i+1), ave_cri_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
 				if cfg.islogger:
 					if log_path is None:
 						log_path = cfg.log_dir + 'train_%s.csv'%(date)#cfg.log_dir = ./Csv/
@@ -93,7 +92,7 @@ def train_model(cfg, env, log_path = None):
 							f.write('%d,%1.4f,%1.4f,%1.4f,%dmin%dsec\n'%(i, ave_act_loss/(i+1), ave_cri_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
 			
 			elif cfg.mode == 'train_emv':
-				print('step:%d/%d, actic loss:%1.3f, L:%1.3f, %dmin%dsec\n'%(i, cfg.steps, ave_act_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
+				print('step:%d/%d, actic loss:%1.3f, L:%1.3f, %dmin%dsec'%(i, cfg.steps, ave_act_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
 				if cfg.islogger:
 					if log_path is None:
 						log_path = cfg.log_dir + 'train_%s.csv'%(date)#cfg.log_dir = ./Csv/
@@ -102,25 +101,29 @@ def train_model(cfg, env, log_path = None):
 					else:
 						with open(log_path, 'a') as f:
 							f.write('%d,%1.4f,%1.4f,%dmin%dsec\n'%(i, ave_act_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
-			if(ave_L < min_L):
-				min_L = ave_L
-				if cfg.issaver:		
-					torch.save(act_model.state_dict(), cfg.model_dir + '%s_step%d_act.pt'%(date, i))#'cfg.model_dir = ./Pt/'
+			if(ave_L/(i+1) < min_L):
+				min_L = ave_L/(i+1)
+				
 			else:
 				cnt += 1
-				if(cnt >= 150):
+				print(f'cnt:{cnt}/50')
+				if(cnt >= 50):
 					print('early stop, average cost cant decrease anymore')
 					if log_path is not None:
 						with open(log_path, 'a') as f:
 							f.write('\nearly stop')
 					break
 			t1 = time()
+	if cfg.issaver:		
+		torch.save(act_model.state_dict(), cfg.model_dir + '%s_step%d_act.pt'%(date, i))#'cfg.model_dir = ./Pt/'
+		print('save model...')
 
 if __name__ == '__main__':
 	cfg = load_pkl(pkl_parser().path)
 	env = Env_tsp(cfg)
 
 	if cfg.mode in ['train', 'train_emv']:
+		# train_emv --> exponential moving average, not use critic model
 		train_model(cfg, env)
 	else:
 		raise NotImplementedError('train and train_emv only, specify train pkl file')

@@ -9,7 +9,7 @@ def search_tour(cfg, env):
 	
 	random_tour = env.get_random_tour()
 	env.show(test_input, random_tour)
-	print('random tour')
+	print('random tour...')
 
 	t1 = time()
 	pred_tour = sampling(cfg, env, test_input)

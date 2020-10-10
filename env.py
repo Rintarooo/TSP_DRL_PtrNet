@@ -28,10 +28,8 @@ class Env_tsp():
 		'''
 		if seed is not None:
 			torch.manual_seed(seed)
-		if torch.cuda.is_available():
-			return torch.cuda.FloatTensor(self.city_t, 2).uniform_(0, 1)
-		else:
-			return torch.FloatTensor(self.city_t, 2).uniform_(0, 1)
+		device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+		return torch.rand((self.city_t, 2), device = device)
 		
 	def stack_nodes(self):
 		'''
@@ -41,6 +39,15 @@ class Env_tsp():
 		list = [self.get_nodes() for i in range(self.batch)]
 		inputs = torch.stack(list, dim = 0)
 		return inputs
+	
+	def get_batch_nodes(self, n_samples, seed = None):
+		'''
+		return nodes:(batch,city_t,2)
+		'''
+		if seed is not None:
+			torch.manual_seed(seed)
+		device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+		return torch.rand((n_samples, self.city_t, 2), device = device)
 		
 	def stack_random_tours(self):
 		'''

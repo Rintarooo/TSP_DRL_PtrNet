@@ -1,7 +1,11 @@
 # TSP Solver with Deep RL
-This is PyTorch implementation of NEURAL COMBINATORIAL OPTIMIZATION WITH REINFORCEMENT LEARNING by Bello et al. 2016[https://arxiv.org/abs/1611.09940].
-
-Pointer Networks is introduced by Vinyals et al. 2015[https://arxiv.org/abs/1506.03134]. This model uses attention to output a permutation of the input index.
+This is PyTorch implementation of NEURAL COMBINATORIAL OPTIMIZATION WITH REINFORCEMENT LEARNING by Bello et al. 2016
+[https://arxiv.org/abs/1611.09940]
+  
+Pointer Networks is the model architecture proposed by Vinyals et al. 2015
+[https://arxiv.org/abs/1506.03134]
+  
+This model uses attention to output a permutation of the input index.
 
 
 ![Screen Shot 2020-05-12 at 12 15 35 AM](https://user-images.githubusercontent.com/51239551/81578424-bf082f80-93e5-11ea-812a-914c9046587a.png)
@@ -36,10 +40,10 @@ Search strategy called Active Search takes actor model and use policy gradient f
 
 First generate the pickle file contaning hyperparameter values by running the following command  
 
-(in this example, batch size is 512, 20 city nodes, 10000 steps).
+(in this example, batch size is 512, 20 city nodes, 13000 steps).
 
 ```bash
-python config.py -m train -b 512 -ct 20 -s 10000
+python config.py -m train -b 512 -ct 20 -s 13000
 ```
 `-m train` could be replaced with `-m train_emv`. emv is the abbreviation of 'Exponential Moving Average', which doesn't need critic model. Then, go on training.
 ```bash
@@ -49,9 +53,9 @@ python train.py -p Pkl/train20.pkl
 ### Inference
 After completing training, set the configuration for inference.  
 Now, you can see how the training process went from the csv files in the 'Csv' dir.  
-You may use my pre-trained weight `Pt/0825_15_49_step4990_act.pt` in the 'Pt' dir.
+You may use my pre-trained weight `Pt/1010_02_23_step12999_act.pt` which I've trained for 20 nodes'.
 ```bash
-python config.py -m test -ct 20 -s 10 --islogger -ap Pt/0825_15_49_step4990_act.pt
+python config.py -m test -ct 20 -s 10 --islogger -ap Pt/1010_02_23_step12999_act.pt
 ```
 ```bash
 python infer.py -p Pkl/test20.pkl
@@ -69,7 +73,7 @@ I leave my own environment below. I tested it out on a single GPU.
 ### Dependencies
 * Python = 3.6.10
 * PyTorch = 1.2.0
-* tqdm
+* tqdm (if you need)
 * numpy
 * matplotlib (only for plotting)
 
