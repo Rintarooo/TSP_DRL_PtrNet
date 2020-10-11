@@ -5,7 +5,7 @@ This is PyTorch implementation of NEURAL COMBINATORIAL OPTIMIZATION WITH REINFOR
 Pointer Networks is the model architecture proposed by Vinyals et al. 2015
 [https://arxiv.org/abs/1506.03134]
   
-This model uses attention to output a permutation of the input index.
+This model uses attention mechanism to output a permutation of the input index.
 
 
 ![Screen Shot 2020-05-12 at 12 15 35 AM](https://user-images.githubusercontent.com/51239551/81578424-bf082f80-93e5-11ea-812a-914c9046587a.png)
@@ -40,7 +40,7 @@ Search strategy called Active Search takes actor model and use policy gradient f
 
 First generate the pickle file contaning hyperparameter values by running the following command  
 
-(in this example, batch size is 512, 20 city nodes, 13000 steps).
+(in this example, train mode, batch size is 512, 20 city nodes, 13000 steps).
 
 ```bash
 python config.py -m train -b 512 -ct 20 -s 13000
@@ -58,7 +58,7 @@ You may use my pre-trained weight `Pt/1010_02_23_step12999_act.pt` which I've tr
 python config.py -m test -ct 20 -s 10 --islogger -ap Pt/1010_02_23_step12999_act.pt
 ```
 ```bash
-python infer.py -p Pkl/test20.pkl
+python test.py -p Pkl/test20.pkl
 ```
 
 ## Environment
@@ -72,9 +72,9 @@ I leave my own environment below. I tested it out on a single GPU.
 
 ### Dependencies
 * Python = 3.6.10
-* PyTorch = 1.2.0
-* tqdm (if you need)
+* PyTorch = 1.6.0
 * numpy
+* tqdm (if you need)
 * matplotlib (only for plotting)
 
 ## Reference
