@@ -62,7 +62,7 @@ class Config():
 def print_cfg(cfg):
 	print(''.join('%s: %s\n'%item for item in vars(cfg).items()))
 
-def dump_pkl(args, verbose = True, param_log = True, override = None):
+def dump_pkl(args, verbose = True, override = None):
 	cfg = Config(**vars(args))
 	if os.path.exists(cfg.pkl_path):
 		override = input(f'found the same name pkl file "{cfg.pkl_path}".\noverride this file? [y/n]:')
@@ -73,11 +73,7 @@ def dump_pkl(args, verbose = True, param_log = True, override = None):
 		print('--- save pickle file in %s ---\n'%cfg.pkl_path)
 		if verbose:
 			print_cfg(cfg)
-		if param_log:
-			path = '%s%s_param_%s.csv'%(cfg.log_dir, cfg.task, cfg.dump_date)#cfg.log_dir = ./Csv/
-			with open(path, 'w') as f:
-				f.write(''.join('%s,%s\n'%item for item in vars(cfg).items()))
-	
+		
 def load_pkl(pkl_path, verbose = True):
 	if not os.path.isfile(pkl_path):
 		raise FileNotFoundError('pkl_path')

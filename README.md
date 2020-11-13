@@ -8,7 +8,7 @@ Pointer Networks is the model architecture proposed by Vinyals et al. 2015
 This model uses attention mechanism to output a permutation of the input index.
 
 
-![Screen Shot 2020-05-12 at 12 15 35 AM](https://user-images.githubusercontent.com/51239551/81578424-bf082f80-93e5-11ea-812a-914c9046587a.png)
+![Figure_1](https://user-images.githubusercontent.com/51239551/99033373-17e79900-25be-11eb-83c3-c7f4ce50c2be.png)
 
 
 ## Actor-Critic
@@ -53,9 +53,9 @@ python train.py -p Pkl/train20.pkl
 ### Inference
 After completing training, set the configuration for inference.  
 Now, you can see how the training process went from the csv files in the `Csv` dir.  
-You may use my pre-trained weight `Pt/1010_02_23_step12999_act.pt` which I've trained for 20 nodes'.
+You may use my pre-trained weight `Pt/train20_1113_12_12_step14999_act.pt` which I've trained for 20 nodes'.
 ```bash
-python config.py -m test -t 20 -s 10 --islogger -ap Pt/1010_02_23_step12999_act.pt
+python config.py -m test -t 20 -s 10 -ap Pt/train20_1113_12_12_step14999_act.pt --islogger --seed 123
 ```
 ```bash
 python test.py -p Pkl/test20.pkl

@@ -41,14 +41,16 @@ class PtrNet2(nn.Module):
 		embed = embed_enc_inputs.size(2)
 		enc_h, (h, c) = self.Encoder(embed_enc_inputs, None)
 		ref = enc_h
-		query = h.permute(1,0,2).to(device)# query = self.dec_input.unsqueeze(0).repeat(batch,1).unsqueeze(1).to(device)
-		process_h, process_c = [torch.zeros((1, batch, embed), device = device) for _ in range(2)]
+		# ~ query = h.permute(1,0,2).to(device)# query = self.dec_input.unsqueeze(0).repeat(batch,1).unsqueeze(1).to(device)
+		query = h[-1]
+		# ~ process_h, process_c = [torch.zeros((1, batch, embed), device = device) for _ in range(2)]
 		for i in range(self.n_process):
-			query, (process_h, process_c) = self.Decoder(query, (process_h, process_c))
-			query = query.squeeze(1)
+			# ~ _, (process_h, process_c) = self.Decoder(query, (process_h, process_c))
+			# ~ _, (h, c) = self.Decoder(query, (h, c))
+			# ~ query = query.squeeze(1)
 			for i in range(self.n_glimpse):
 				query = self.glimpse(query, ref)
-				query = query.unsqueeze(1)
+				# ~ query = query.unsqueeze(1)
 		'''	
 		- page 5/15 in paper
 		critic model architecture detail is out there, "Critic’s architecture for TSP"

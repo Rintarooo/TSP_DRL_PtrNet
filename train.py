@@ -112,8 +112,8 @@ def train_model(cfg, env, log_path = None):
 				
 			else:
 				cnt += 1
-				print(f'cnt:{cnt}/50')
-				if(cnt >= 50):
+				print(f'cnt: {cnt}/20')
+				if(cnt >= 20):
 					print('early stop, average cost cant decrease anymore')
 					if log_path is not None:
 						with open(log_path, 'a') as f:
@@ -121,7 +121,7 @@ def train_model(cfg, env, log_path = None):
 					break
 			t1 = time()
 	if cfg.issaver:		
-		torch.save(act_model.state_dict(), cfg.model_dir + '%s%s_step%d_act.pt'%(cfg.task, date, i))#'cfg.model_dir = ./Pt/'
+		torch.save(act_model.state_dict(), cfg.model_dir + '%s_%s_step%d_act.pt'%(cfg.task, date, i))#'cfg.model_dir = ./Pt/'
 		print('save model...')
 
 if __name__ == '__main__':
