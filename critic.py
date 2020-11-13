@@ -15,29 +15,40 @@ class PtrNet2(nn.Module):
 			self.Vec = nn.Parameter(torch.FloatTensor(cfg.embed))
 		self.W_q = nn.Linear(cfg.hidden, cfg.hidden, bias = True)
 		self.W_ref = nn.Conv1d(cfg.hidden, cfg.hidden, 1, 1)
-		self.dec_input = nn.Parameter(torch.FloatTensor(cfg.embed))
+		# self.dec_input = nn.Parameter(torch.FloatTensor(cfg.embed))
 		self.final2FC = nn.Sequential(
 					nn.Linear(cfg.hidden, cfg.hidden, bias = False),
 					nn.ReLU(inplace = False),
 					nn.Linear(cfg.hidden, 1, bias = False))
 		self._initialize_weights(cfg.init_min, cfg.init_max)
-		self.n_glimpse = 1
+		self.n_glimpse = cfg.n_glimpse
+		self.n_process = cfg.n_process
 	
 	def _initialize_weights(self, init_min = -0.08, init_max = 0.08):
 		for param in self.parameters():
 			nn.init.uniform_(param.data, init_min, init_max)
 			
 	def forward(self, x, device):
+		'''	x: (batch, city_t, 2)
+			enc_h: (batch, city_t, embed)
+			query(Decoder input): (batch, 1, embed)
+			h: (1, batch, embed)
+			return: pred_l: (batch)
+		'''
 		x = x.to(device)
 		batch, city_t, xy = x.size()
 		embed_enc_inputs = self.Embedding(x)
+		embed = embed_enc_inputs.size(2)
 		enc_h, (h, c) = self.Encoder(embed_enc_inputs, None)
-		dec_input = self.dec_input.unsqueeze(0).repeat(batch,1).unsqueeze(1).to(device)
-		for i in range(city_t):
-			_, (h, c) = self.Decoder(dec_input, (h, c))
-			query, ref = h.squeeze(0), enc_h
+		ref = enc_h
+		query = h.permute(1,0,2).to(device)# query = self.dec_input.unsqueeze(0).repeat(batch,1).unsqueeze(1).to(device)
+		process_h, process_c = [torch.zeros((1, batch, embed), device = device) for _ in range(2)]
+		for i in range(self.n_process):
+			query, (process_h, process_c) = self.Decoder(query, (process_h, process_c))
+			query = query.squeeze(1)
 			for i in range(self.n_glimpse):
 				query = self.glimpse(query, ref)
+				query = query.unsqueeze(1)
 		'''	
 		- page 5/15 in paper
 		critic model architecture detail is out there, "Critic’s architecture for TSP"
@@ -52,10 +63,10 @@ class PtrNet2(nn.Module):
 	
 	def glimpse(self, query, ref, infinity = 1e8):
 		"""	Args: 
-			query: is the hidden state of the decoder at the current
-				(batch, 128)
+			query: the hidden state of the decoder at the current
+			(batch, 128)
 			ref: the set of hidden states from the encoder. 
-				(batch, city_t, 128)
+			(batch, city_t, 128)
 		"""
 		u1 = self.W_q(query).unsqueeze(-1).repeat(1,1,ref.size(1))# u1: (batch, 128, city_t)
 		u2 = self.W_ref(ref.permute(0,2,1))# u2: (batch, 128, city_t)

@@ -40,10 +40,10 @@ Search strategy called Active Search takes actor model and use policy gradient f
 
 First generate the pickle file contaning hyperparameter values by running the following command  
 
-(in this example, train mode, batch size is 512, 20 city nodes, 13000 steps).
+(in this example, train mode, batch size 512, 20 city nodes, 13000 steps).
 
 ```bash
-python config.py -m train -b 512 -ct 20 -s 13000
+python config.py -m train -b 512 -t 20 -s 13000
 ```
 `-m train` could be replaced with `-m train_emv`. emv is the abbreviation of 'Exponential Moving Average', which doesn't need critic model. Then, go on training.
 ```bash
@@ -52,10 +52,10 @@ python train.py -p Pkl/train20.pkl
 
 ### Inference
 After completing training, set the configuration for inference.  
-Now, you can see how the training process went from the csv files in the 'Csv' dir.  
+Now, you can see how the training process went from the csv files in the `Csv` dir.  
 You may use my pre-trained weight `Pt/1010_02_23_step12999_act.pt` which I've trained for 20 nodes'.
 ```bash
-python config.py -m test -ct 20 -s 10 --islogger -ap Pt/1010_02_23_step12999_act.pt
+python config.py -m test -t 20 -s 10 --islogger -ap Pt/1010_02_23_step12999_act.pt
 ```
 ```bash
 python test.py -p Pkl/test20.pkl

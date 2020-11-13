@@ -17,6 +17,12 @@ torch.backends.cudnn.benchmark = True
 
 def train_model(cfg, env, log_path = None):
 	date = datetime.now().strftime('%m%d_%H_%M')
+	if cfg.islogger:
+		param_path = cfg.log_dir + '%s_%s_param.csv'%(date, cfg.task)# cfg.log_dir = ./Csv/
+		print(f'generate {param_path}')
+		with open(param_path, 'w') as f:
+			f.write(''.join('%s,%s\n'%item for item in vars(cfg).items()))
+
 	act_model = PtrNet1(cfg)
 	if cfg.optim == 'Adam':
 		act_optim = optim.Adam(act_model.parameters(), lr = cfg.lr)
@@ -84,7 +90,7 @@ def train_model(cfg, env, log_path = None):
 				print('step:%d/%d, actic loss:%1.3f, critic loss:%1.3f, L:%1.3f, %dmin%dsec'%(i, cfg.steps, ave_act_loss/(i+1), ave_cri_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
 				if cfg.islogger:
 					if log_path is None:
-						log_path = cfg.log_dir + 'train_%s.csv'%(date)#cfg.log_dir = ./Csv/
+						log_path = cfg.log_dir + '%s_%s_train.csv'%(date, cfg.task)#cfg.log_dir = ./Csv/
 						with open(log_path, 'w') as f:
 							f.write('step,actic loss,critic loss,average distance,time\n')
 					else:
@@ -95,7 +101,7 @@ def train_model(cfg, env, log_path = None):
 				print('step:%d/%d, actic loss:%1.3f, L:%1.3f, %dmin%dsec'%(i, cfg.steps, ave_act_loss/(i+1), ave_L/(i+1), (t2-t1)//60, (t2-t1)%60))
 				if cfg.islogger:
 					if log_path is None:
-						log_path = cfg.log_dir + 'train_%s.csv'%(date)#cfg.log_dir = ./Csv/
+						log_path = cfg.log_dir + '%s_%s_train_emv.csv'%(date, cfg.task)#cfg.log_dir = ./Csv/
 						with open(log_path, 'w') as f:
 							f.write('step,actic loss,average distance,time\n')
 					else:
@@ -115,7 +121,7 @@ def train_model(cfg, env, log_path = None):
 					break
 			t1 = time()
 	if cfg.issaver:		
-		torch.save(act_model.state_dict(), cfg.model_dir + '%s_step%d_act.pt'%(date, i))#'cfg.model_dir = ./Pt/'
+		torch.save(act_model.state_dict(), cfg.model_dir + '%s%s_step%d_act.pt'%(cfg.task, date, i))#'cfg.model_dir = ./Pt/'
 		print('save model...')
 
 if __name__ == '__main__':
