@@ -58,7 +58,7 @@ class PtrNet2(nn.Module):
 		
 		query(batch,hidden)*FC(hidden,hidden)*FC(hidden,1) -> pred_l(batch,1) ->pred_l(batch)
 		'''
-		pred_l = self.final2FC(query).squeeze(-1)
+		pred_l = self.final2FC(query).squeeze(-1).squeeze(-1)
 		return pred_l 
 	
 	def glimpse(self, query, ref, infinity = 1e8):
