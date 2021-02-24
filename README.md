@@ -1,5 +1,5 @@
 # TSP Solver with Deep RL
-This is PyTorch implementation of NEURAL COMBINATORIAL OPTIMIZATION WITH REINFORCEMENT LEARNING by Bello et al. 2016
+This is PyTorch implementation of NEURAL COMBINATORIAL OPTIMIZATION WITH REINFORCEMENT LEARNING, Bello et al. 2016
 [https://arxiv.org/abs/1611.09940]
   
 Pointer Networks is the model architecture proposed by Vinyals et al. 2015
@@ -23,7 +23,7 @@ Given a graph of cities where the cities are the nodes, critic model predicts ex
 Actor:  Defines the agent's behavior, its policy
 Critic: Estimates the state-value 
 ```
-
+<br><br>
 
 ## Active Search and Sampling
 ### Inference
@@ -49,6 +49,7 @@ python config.py -m train -b 512 -t 20 -s 13000
 ```bash
 python train.py -p Pkl/train20.pkl
 ```  
+<br><br>
 
 ### Inference
 After completing training, set the configuration for inference.  
@@ -60,6 +61,7 @@ python config.py -m test -t 20 -s 10 -ap Pt/train20_1113_12_12_step14999_act.pt 
 ```bash
 python test.py -p Pkl/test20.pkl
 ```
+<br><br>
 
 ## Environment
 I leave my own environment below. I tested it out on a single GPU.
@@ -76,6 +78,24 @@ I leave my own environment below. I tested it out on a single GPU.
 * numpy
 * tqdm (if you need)
 * matplotlib (only for plotting)
+
+### Docker(option)
+1. build or pull docker image
+
+build image(this might take some time)
+```bash
+./docker.sh build
+```
+pull image
+```bash
+docker pull docker4rintarooo/tspdrl:latest
+```
+
+2. run container using docker image(-v option is to mount directory)
+```bash
+./docker.sh run
+```
+<br><br>
 
 ## Reference
 * https://github.com/higgsfield/np-hard-deep-reinforcement-learning
