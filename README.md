@@ -10,23 +10,25 @@ This model uses attention mechanism to output a permutation of the input index.
 
 ![Figure_1](https://user-images.githubusercontent.com/51239551/99033373-17e79900-25be-11eb-83c3-c7f4ce50c2be.png)
 
-
-## Actor-Critic
-### Training without supervised solution
+<br><br>
 In this work, we tackle Traveling Salesman Problem(TSP), which is one of the combinatorial optimization problems known as NP-hard. TSP seeks for the shortest tour for a salesman to visit each city exactly once.
 
-In the training phase, this TSP solver optimizes 2 different types of Pointer Networks, Actor and Critic model. 
+## Training without supervised solution
 
-Given a graph of cities where the cities are the nodes, critic model predicts expected tour length, which is generally called state-value. Parameters of critic model are optimized as estimated tour length catch up with the actual length calculated from the tour(city permutation) predicted by actor model. Actor model updates its policy parameters with the value called advantage which subtracts state-value from the actual tour length.
+In the training phase, this TSP solver will optimize 2 different types of Pointer Networks, Actor and Critic model. 
 
+Given a graph of cities where the cities are the nodes, critic model predicts expected tour length, which is generally called state-value. Parameters of critic model are optimized as the estimated tour length catches up with the actual length calculated from the tour(city permutation) predicted by actor model. Actor model updates its policy parameters with the value called advantage which subtracts state-value from the actual tour length.
+
+### Actor-Critic
 ``` 
 Actor:  Defines the agent's behavior, its policy
 Critic: Estimates the state-value 
 ```
+
 <br><br>
 
+## Inference
 ## Active Search and Sampling
-### Inference
 In this paper, two approaches to find the best tour at inference time are proposed, which we refer to as Sampling and Active Search. 
 
 Search strategy called Active Search takes actor model and use policy gradient for updating its parameters to find the shortest tour. Sampling simply just select the shortest tour out of 1 batch.
