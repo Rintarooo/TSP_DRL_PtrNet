@@ -8,8 +8,6 @@ Pointer Networks is the model architecture proposed by Vinyals et al. 2015
 This model uses attention mechanism to output a permutation of the input index.
 
 
-![Figure_1](https://user-images.githubusercontent.com/51239551/99033373-17e79900-25be-11eb-83c3-c7f4ce50c2be.png)
-
 <br><br>
 In this work, we tackle Traveling Salesman Problem(TSP), which is one of the combinatorial optimization problems known as NP-hard. TSP seeks for the shortest tour for a salesman to visit each city exactly once.
 
@@ -33,8 +31,7 @@ In this paper, two approaches to find the best tour at inference time are propos
 
 Search strategy called Active Search takes actor model and use policy gradient for updating its parameters to find the shortest tour. Sampling simply just select the shortest tour out of 1 batch.
 
-![Figure_13png](https://user-images.githubusercontent.com/51239551/82798619-bae31400-9eb3-11ea-9cf4-59f1c0a49a88.png)
-
+![Figure_1](https://user-images.githubusercontent.com/51239551/99033373-17e79900-25be-11eb-83c3-c7f4ce50c2be.png)
 
 ## Usage
 
@@ -88,7 +85,7 @@ build image(this might take some time)
 ```bash
 ./docker.sh build
 ```
-pull image
+pull image from [dockerhub](https://hub.docker.com/repository/docker/docker4rintarooo/tspdrl/tags?page=1&ordering=last_updated)
 ```bash
 docker pull docker4rintarooo/tspdrl:latest
 ```
@@ -96,6 +93,10 @@ docker pull docker4rintarooo/tspdrl:latest
 2. run container using docker image(-v option is to mount directory)
 ```bash
 ./docker.sh run
+```
+If you don't have a GPU, you can run
+```bash
+./docker.sh run_cpu
 ```
 <br><br>
 
