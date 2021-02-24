@@ -7,6 +7,7 @@ Pointer Networks is the model architecture proposed by Vinyals et al. 2015
   
 This model uses attention mechanism to output a permutation of the input index.
 
+![Screen Shot 2021-02-25 at 12 45 34 AM](https://user-images.githubusercontent.com/51239551/109026426-13756500-7703-11eb-9880-6b8be0b47b4e.png)
 
 <br><br>
 In this work, we tackle Traveling Salesman Problem(TSP), which is one of the combinatorial optimization problems known as NP-hard. TSP seeks for the shortest tour for a salesman to visit each city exactly once.
