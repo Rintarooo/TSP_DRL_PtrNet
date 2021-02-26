@@ -10,7 +10,7 @@ This model uses attention mechanism to output a permutation of the input index.
 ![Screen Shot 2021-02-25 at 12 45 34 AM](https://user-images.githubusercontent.com/51239551/109026426-13756500-7703-11eb-9880-6b8be0b47b4e.png)
 
 <br><br>
-In this work, we tackle Traveling Salesman Problem(TSP), which is one of the combinatorial optimization problems known as NP-hard. TSP seeks for the shortest tour for a salesman to visit each city exactly once.
+In this work, we will tackle Traveling Salesman Problem(TSP), which is one of the combinatorial optimization problems known as NP-hard. TSP seeks for the shortest tour for a salesman to visit each city exactly once.
 
 ## Training without supervised solution
 
@@ -52,7 +52,7 @@ python train.py -p Pkl/train20.pkl
 <br><br>
 
 ### Inference
-After completing training, set the configuration for inference.  
+If training is done, set the configuration for inference.  
 Now, you can see how the training process went from the csv files in the `Csv` dir.  
 You may use my pre-trained weight `Pt/train20_1113_12_12_step14999_act.pt` which I've trained for 20 nodes'.
 ```bash
@@ -71,8 +71,8 @@ I leave my own environment below. I tested it out on a single GPU.
 	* NVIDIA® GeForce® RTX 2080 Ti VENTUS 11GB OC
 * CPU:
 	* Intel® Xeon® CPU E5640 @ 2.67GHz
-* NVIDIA® Driver 455.45.01
-* Docker 20.10.3
+* NVIDIA® Driver = 455.45.01
+* Docker = 20.10.3
 * [nvidia-docker2](https://github.com/NVIDIA/nvidia-docker)(for GPU)
 
 ### Dependencies
