@@ -71,6 +71,9 @@ I leave my own environment below. I tested it out on a single GPU.
 	* NVIDIA® GeForce® RTX 2080 Ti VENTUS 11GB OC
 * CPU:
 	* Intel® Xeon® CPU E5640 @ 2.67GHz
+* NVIDIA® Driver 455.45.01
+* Docker 20.10.3
+* [nvidia-docker2](https://github.com/NVIDIA/nvidia-docker)(for GPU)
 
 ### Dependencies
 * Python = 3.6.10
@@ -80,6 +83,18 @@ I leave my own environment below. I tested it out on a single GPU.
 * matplotlib (only for plotting)
 
 ### Docker(option)
+Make sure you've already installed `Docker`
+```bash
+docker version
+```
+latest `NVIDIA® Driver`
+```bash
+nvidia-smi
+```
+and `nvidia-docker2`(for GPU)
+<br>
+#### Usage
+
 1. build or pull docker image
 
 build image(this might take some time)
