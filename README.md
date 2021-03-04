@@ -124,4 +124,6 @@ If you don't have a GPU, you can run
 * https://github.com/jingw2/neural-combinatorial-optimization-rl
 * https://github.com/dave-yxw/rl_tsp
 * https://github.com/shirgur/PointerNet
+* https://github.com/MichelDeudon/encode-attend-navigate
+* https://github.com/qiang-ma/HRL-for-combinatorial-optimization
 * https://www.youtube.com/watch?v=mxCVgVrUw50&ab_channel=%D0%9A%D0%BE%D0%BC%D0%BF%D1%8C%D1%8E%D1%82%D0%B5%D1%80%D0%BD%D1%8B%D0%B5%D0%BD%D0%B0%D1%83%D0%BA%D0%B8
