@@ -5,8 +5,9 @@ from config import Config, load_pkl, pkl_parser
 from search import sampling, active_search
 	
 def search_tour(cfg, env):
-	test_input = env.get_nodes(cfg.seed)
-	
+	#test_input = env.get_nodes(cfg.seed)
+	test_input = env.read_nodes('resources/rectangle20.txt')
+
 	# random 
 	print('generate random tour...')
 	random_tour = env.get_random_tour()

@@ -21,7 +21,19 @@ class Env_tsp():
 		'''
 		self.batch = cfg.batch
 		self.city_t = cfg.city_t
-			
+
+	def read_nodes(self, file = None):
+		'''
+		reads nodes:(city_t, 2)
+		'''
+		nodes = []
+		with open(file) as f:
+			for line in f:
+				f_pair = [float(i) for i in line.split(',') if i.strip()]
+				if len(f_pair) > 0:
+					nodes.append(f_pair)
+		return torch.tensor(nodes)
+
 	def get_nodes(self, seed = None):
 		'''
 		return nodes:(city_t,2)
